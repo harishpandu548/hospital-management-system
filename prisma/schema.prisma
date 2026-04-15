@@ -1,0 +1,259 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+  DELETED
+}
+
+enum AppointmentStatus {
+  CREATED
+  SCHEDULED
+  CHECKED_IN
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum PaymentStatus {
+  PAID
+  PENDING
+  FAILED
+}
+
+//-------------------------------RBAC models------------------------------------------------
+//user model
+model User {
+  id       String     @id @default(cuid())
+  phone    String     @unique
+  email    String?    @unique
+  password String
+  status   UserStatus @default(ACTIVE)
+
+  roles    UserRole[]
+  patients Patient[]
+  doctors  Doctor[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+//role model
+model Role {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  users       UserRole[]
+  permissions RolePermission[]
+}
+
+//permission model
+model Permission {
+  id   Int    @id @default(autoincrement())
+  code String @unique
+
+  roles RolePermission[]
+}
+
+//user role model
+model UserRole {
+  userId String
+  roleId Int
+
+  user User @relation(fields: [userId], references: [id])
+  role Role @relation(fields: [roleId], references: [id])
+
+  assigned DateTime @default(now())
+
+  @@id([userId, roleId])
+}
+
+//role permission model
+model RolePermission {
+  roleId       Int
+  permissionId Int
+
+  role       Role       @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@id([roleId, permissionId])
+}
+
+//-------------------------------medical core models------------------------------------------------
+//patient model
+model Patient {
+  id String @id @default(cuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  firstName   String
+  lastName    String
+  gender      String
+  dateOfBirth DateTime
+
+  phone String
+  email String?
+
+  bloodGroup String?
+  heightCm   Int?
+  weightKg   Int?
+
+  address String?
+  city    String?
+  state   String?
+
+  medicalNotes String?
+
+  createdBy String //receptionist / admin / patient userId
+
+  appointments Appointment[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([phone])
+}
+
+//doctor model
+model Doctor {
+  id String @id @default(cuid())
+
+  userId String?
+  user   User?   @relation(fields: [userId], references: [id])
+
+  fullname        String
+  specialization  String
+  qualification   String?
+  experienceYears Int
+
+  isActive Boolean @default(true)
+
+  appointments      Appointment[]
+  availabilityRules DoctorAvailabilityRule[]
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+}
+
+//doctor availability rules model
+model DoctorAvailabilityRule {
+  id String @id @default(cuid())
+
+  doctorId String
+  doctor   Doctor @relation(fields: [doctorId], references: [id])
+
+  dayOfWeek Int //0=sunday,6=saturday
+  startTime DateTime
+  endTime   DateTime
+
+  slotDurationMinutes Int
+  maxPatientsPerSlot  Int
+
+  validFrom DateTime
+  validTo   DateTime?
+
+  createdBy String //receptionist userId
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  @@index([doctorId, dayOfWeek])
+}
+
+//appointment model
+model Appointment {
+  id String @id @default(cuid())
+
+  patientId String
+  doctorId  String
+
+  patient Patient @relation(fields: [patientId], references: [id])
+  doctor  Doctor  @relation(fields: [doctorId], references: [id])
+
+  appointmentDate DateTime
+  slotStart       DateTime
+  slotEnd         DateTime
+
+  status        AppointmentStatus //appointment status is the enum we defined
+  paymentStatus PaymentStatus     @default(PENDING)
+
+  remarks String?
+
+  createdBy String //receptionist / patient
+
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  deletedAt DateTime?
+
+  statusLogs AppointmentStatusLog[]
+
+  @@index([doctorId, appointmentDate])
+  @@index([patientId])
+}
+
+//appointment status log model
+model AppointmentStatusLog {
+  id String @id @default(cuid())
+
+  appointmentId String
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+
+  oldStatus     AppointmentStatus?
+  newStatus     AppointmentStatus
+  changedBy     String
+  changedByRole String
+  reason        String?
+
+  changedAt DateTime @default(now())
+
+  @@index([appointmentId])
+}
+
+//appointment slot lock model
+model AppointmentSlotLock {
+  id String @id @default(cuid())
+
+  doctorId        String
+  appointmentDate DateTime
+  slotStart       DateTime
+  slotEnd         DateTime
+
+  lockedBy      String
+  lockExpiresAt DateTime
+
+  createdAt DateTime @default(now())
+
+  @@index([doctorId, appointmentDate])
+}
+
+//audit log model
+model AuditLog {
+  id String @id @default(cuid())
+
+  entityType String
+  entityId   String
+  action     String
+
+  performedBy String
+
+  createdAt DateTime @default(now())
+}
