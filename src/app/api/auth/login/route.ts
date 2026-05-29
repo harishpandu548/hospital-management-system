@@ -15,84 +15,75 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // find user
     const user = await prisma.user.findUnique({
       where: { phone },
       include: {
-        roles: {
-          include: {
-            role: true
-          }
-        }
-      }
+        roles: { include: { role: true } },
+      },
     });
 
     if (!user) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // compare password
     const isValid = await bcrypt.compare(password, user.password);
-
     if (!isValid) {
-      return NextResponse.json(
-        { error: "Invalid credentials" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
     }
 
-    // extract roles
-    const roles = user.roles.map(r => r.role.name);
+    if (user.status === "SUSPENDED") {
+      return NextResponse.json(
+        { error: "Account suspended. Please contact the administrator." },
+        { status: 403 }
+      );
+    }
+    if (user.status === "DELETED") {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 });
+    }
 
+    const roles = user.roles.map((r) => r.role.name);
     if (roles.length === 0) {
-      return NextResponse.json(
-        { error: "No roles assigned" },
-        { status: 403 }
-      );
+      return NextResponse.json({ error: "No roles assigned" }, { status: 403 });
     }
 
-    // if activeRole not provided
+    // Resolve the active role for this request
+    let resolvedRole: string;
     if (!activeRole) {
-      if (roles.length === 1) {
-        // auto login
-        const token = signToken(user.id, roles[0]);
-
-        return NextResponse.json({
-          token,
-          activeRole: roles[0]
-        });
+      if (roles.length > 1) {
+        return NextResponse.json({ message: "Select role", roles });
       }
-
-      // multiple roles, ask frontend to choose
-      return NextResponse.json({
-        message: "Select role",
-        roles
-      });
+      resolvedRole = roles[0];
+    } else {
+      if (!roles.includes(activeRole)) {
+        return NextResponse.json({ error: "Invalid role selection" }, { status: 403 });
+      }
+      resolvedRole = activeRole;
     }
 
-    // if activeRole provided  validate him
-    if (!roles.includes(activeRole)) {
-      return NextResponse.json(
-        { error: "Invalid role selection" },
-        { status: 403 }
-      );
+    // Resolve a display name for the user based on their role
+    let name: string = phone;
+    try {
+      if (resolvedRole === "PATIENT") {
+        const patient = await prisma.patient.findFirst({
+          where: { userId: user.id },
+          select: { firstName: true, lastName: true },
+        });
+        if (patient) name = `${patient.firstName} ${patient.lastName}`;
+      } else if (resolvedRole === "DOCTOR") {
+        const doctor = await prisma.doctor.findFirst({
+          where: { userId: user.id },
+          select: { fullname: true },
+        });
+        if (doctor) name = doctor.fullname;
+      }
+      // ADMIN / RECEPTIONIST — phone is fine as fallback
+    } catch {
+      // Name lookup is non-critical; proceed with phone fallback
     }
 
-    // issue token
-    const token = signToken(user.id, activeRole);
-
-    return NextResponse.json({
-      token,
-      activeRole
-    });
-
-  } catch (error) {
-    return NextResponse.json(
-      { error: "Login failed" },
-      { status: 500 }
-    );
+    const token = signToken(user.id, resolvedRole);
+    return NextResponse.json({ token, activeRole: resolvedRole, name });
+  } catch {
+    return NextResponse.json({ error: "Login failed" }, { status: 500 });
   }
 }

@@ -3,53 +3,66 @@ import { redis } from "@/lib/redis";
 
 const QUEUE_KEY = "hms:jobs";
 const DLQ_KEY = "hms:jobs:dead";
+const POLL_INTERVAL_MS = 1000;
 
 export async function processJob(job: any) {
   console.log("Job received:", job);
   switch (job.type) {
     case "APPOINTMENT_CREATED":
-      console.log("send notification for", job.payload.appointmentId);
+      console.log("Notification queued for appointment:", job.payload.appointmentId);
       break;
 
     case "APPOINTMENT_REMINDER":
-      console.log("send Reminder", job.payload);
+      console.log("Reminder queued:", job.payload.reminderType, "for appointment:", job.payload.appointmentId);
       break;
 
     case "SLOT_LOCK_CLEANUP":
-      console.log("cleanup slot locks");
+      console.log("Slot lock cleanup triggered");
+      break;
+
+    case "APPOINTMENT_CANCELLED":
+      console.log("Cancellation notification queued for appointment:", job.payload.appointmentId);
       break;
 
     default:
-      console.log("Unknown Job", job);
+      console.log("Unknown job type:", job.type);
   }
 }
 
 async function startWorker() {
-  console.log("Worker Started");
+  console.log("Worker started — polling Upstash Redis queue:", QUEUE_KEY);
 
   while (true) {
-    const result = await redis.brpop(QUEUE_KEY, 0);
-    if (!result) continue;
-
-    const [, jobString] = result;
-    const job = JSON.parse(jobString);
-
     try {
-      await processJob(job);
-    } catch (error) {
-      console.error("Job Failed", error);
+      const raw = await redis.rpop(QUEUE_KEY);
 
-      //if job failed need to be retried
-      job.attempts = (job.attempts ?? 0) + 1;
-
-      if (job.attempts < job.maxAttempts) {
-        console.log(`Retrying job ${job.id} (Attempt ${job.attempts})`);
-        await redis.lpush(QUEUE_KEY, JSON.stringify(job));
-      } else {
-        console.log(`Moving job ${job.id} to Dead Letter Queue`);
-        await redis.lpush(DLQ_KEY, JSON.stringify(job));
+      if (!raw) {
+        await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS));
+        continue;
       }
+
+      const job = typeof raw === "string" ? JSON.parse(raw) : raw;
+
+      try {
+        await processJob(job);
+      } catch (error) {
+        console.error("Job failed:", error);
+
+        job.attempts = (job.attempts ?? 0) + 1;
+
+        if (job.attempts < job.maxAttempts) {
+          console.log(`Retrying job ${job.id} (attempt ${job.attempts})`);
+          await redis.lpush(QUEUE_KEY, JSON.stringify(job));
+        } else {
+          console.log(`Job ${job.id} exceeded max attempts — moving to DLQ`);
+          await redis.lpush(DLQ_KEY, JSON.stringify(job));
+        }
+      }
+    } catch (err) {
+      console.error("Worker poll error:", err);
+      await new Promise((resolve) => setTimeout(resolve, POLL_INTERVAL_MS * 5));
     }
   }
 }
+
 startWorker();

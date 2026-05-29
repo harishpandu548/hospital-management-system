@@ -1,0 +1,27 @@
+.experience-qualification {
+  padding-top: 10px;
+  padding-left: 10px;
+  padding-right: 10px;
+  display: flex;
+  align-items: center;
+  gap: 40px;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  color: black;
+}
+
+.info-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.icon {
+  font-size: 16px;
+}
+
+@media (max-width: 600px) {
+  .info-item{
+    gap: 2px;
+  }
+}

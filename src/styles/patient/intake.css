@@ -1,0 +1,344 @@
+/* ── Patient Intake Page ───────────────────────────────── */
+.intake-shell {
+  min-height: calc(100vh - 68px);
+  background: #f8fafc;
+  padding: 32px 24px 64px;
+}
+
+.intake-inner {
+  max-width: 780px;
+  margin: 0 auto;
+}
+
+/* Progress bar */
+.intake-progress {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 32px;
+}
+
+.intake-step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+}
+
+.intake-step-circle {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 800;
+  border: 2.5px solid;
+  transition: all 0.3s;
+  z-index: 1;
+}
+
+.intake-step-circle.done     { background: #6366f1; border-color: #6366f1; color: #fff; }
+.intake-step-circle.active   { background: #fff; border-color: #6366f1; color: #6366f1; }
+.intake-step-circle.upcoming { background: #fff; border-color: #e2e8f0; color: #94a3b8; }
+
+.intake-step-label {
+  margin-top: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #64748b;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.intake-step-connector {
+  flex: 1;
+  height: 2.5px;
+  background: #e2e8f0;
+  position: relative;
+  top: -12px;
+  transition: background 0.3s;
+}
+.intake-step-connector.done { background: #6366f1; }
+
+/* Profile card */
+.intake-card {
+  background: #fff;
+  border-radius: 22px;
+  border: 1px solid #e2e8f0;
+  box-shadow: 0 2px 12px rgba(15,23,42,0.07);
+  overflow: hidden;
+  margin-bottom: 16px;
+}
+
+.intake-card-head {
+  padding: 16px 22px;
+  border-bottom: 1px solid #f1f5f9;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #fafbff;
+}
+
+.intake-card-title {
+  font-size: 13px;
+  font-weight: 800;
+  color: #374151;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.intake-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(170px,1fr));
+  gap: 10px;
+  padding: 16px 22px;
+}
+
+.intake-field {
+  padding: 12px 14px;
+  background: #f8fafc;
+  border-radius: 12px;
+  border: 1px solid #f1f5f9;
+}
+.intake-field-label { font-size: 10px; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 4px; }
+.intake-field-value { font-size: 13.5px; font-weight: 700; color: #0f172a; word-break: break-word; }
+
+/* Medical update form */
+.intake-form-field {
+  margin-bottom: 16px;
+}
+.intake-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 700;
+  color: #475569;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.intake-textarea {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 14px;
+  font-family: inherit;
+  resize: vertical;
+  outline: none;
+  line-height: 1.6;
+  box-sizing: border-box;
+  transition: border-color 0.18s;
+}
+.intake-textarea:focus { border-color: #6366f1; }
+
+/* File upload zone */
+.intake-upload-zone {
+  border: 2px dashed #c7d2fe;
+  border-radius: 14px;
+  padding: 22px;
+  text-align: center;
+  cursor: pointer;
+  background: #fafbff;
+  transition: all 0.2s;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+}
+.intake-upload-zone:hover,
+.intake-upload-zone.dragging {
+  background: #f0f0ff;
+  border-color: #6366f1;
+}
+.intake-upload-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  background: #eef2ff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #6366f1;
+  font-size: 22px;
+}
+.intake-upload-text { font-size: 14px; font-weight: 700; color: #6366f1; }
+.intake-upload-hint { font-size: 12px; color: #94a3b8; }
+
+/* File list */
+.intake-file-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.intake-file-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  background: #f0fdf4;
+  border-radius: 12px;
+  border: 1px solid #bbf7d0;
+}
+
+.intake-file-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  background: #dcfce7;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.intake-file-name {
+  flex: 1;
+  font-size: 13px;
+  font-weight: 600;
+  color: #166534;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.intake-file-remove {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #dc2626;
+  font-size: 18px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: opacity 0.15s;
+}
+.intake-file-remove:hover { opacity: 0.7; }
+
+/* Existing file (from DB) */
+.intake-file-item.existing {
+  background: #eff6ff;
+  border-color: #bfdbfe;
+}
+.intake-file-item.existing .intake-file-icon { background: #dbeafe; color: #2563eb; }
+.intake-file-item.existing .intake-file-name { color: #1d4ed8; }
+
+/* Prompt buttons */
+.intake-prompt-row {
+  display: flex;
+  gap: 12px;
+  margin-top: 6px;
+}
+
+.intake-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 13px 24px;
+  border-radius: 14px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+
+.intake-btn.primary {
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(99,102,241,0.3);
+  flex: 1;
+}
+.intake-btn.primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+.intake-btn.secondary {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  flex: 1;
+}
+.intake-btn.secondary:hover { background: #e2e8f0; }
+
+.intake-btn.danger {
+  background: #fef2f2;
+  color: #dc2626;
+  border: 1px solid #fecaca;
+}
+
+/* Family member cards */
+.family-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px,1fr));
+  gap: 12px;
+  padding: 14px 22px 18px;
+}
+
+.family-member-card {
+  background: #f8fafc;
+  border-radius: 16px;
+  border: 1px solid #e2e8f0;
+  padding: 16px;
+  transition: all 0.18s;
+  cursor: pointer;
+}
+.family-member-card:hover { border-color: #a5b4fc; box-shadow: 0 4px 14px rgba(99,102,241,0.1); transform: translateY(-2px); }
+
+.family-avatar-sm {
+  width: 42px;
+  height: 42px;
+  border-radius: 13px;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  font-weight: 800;
+  color: #4f46e5;
+  margin-bottom: 10px;
+}
+
+.family-card-name { font-size: 14px; font-weight: 800; color: #0f172a; margin-bottom: 2px; }
+.family-card-rel  { font-size: 11px; color: #6366f1; font-weight: 700; margin-bottom: 8px; }
+.family-card-cond { font-size: 12px; color: #64748b; line-height: 1.4; margin-bottom: 10px; }
+
+.add-family-card {
+  background: #fafbff;
+  border-radius: 16px;
+  border: 2px dashed #c7d2fe;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #6366f1;
+  font-size: 13px;
+  font-weight: 700;
+  text-align: center;
+  transition: all 0.18s;
+  min-height: 130px;
+}
+.add-family-card:hover { background: #f0f0ff; border-color: #6366f1; }
+
+/* Intake final buttons */
+.intake-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+@media (max-width: 560px) {
+  .intake-shell { padding: 16px 14px 48px; }
+  .intake-grid { grid-template-columns: repeat(2, 1fr); }
+  .intake-actions { flex-direction: column; }
+  .family-cards-grid { grid-template-columns: repeat(2, 1fr); }
+}

@@ -98,7 +98,6 @@ export async function POST(req: NextRequest) {
     });
 
   } catch (error: any) {
-    console.error(error);
     return NextResponse.json(
       { error: error.message || "Failed to create doctor" },
       { status: 500 }
@@ -116,6 +115,9 @@ export async function GET(req: NextRequest) {
 
     if (activeRole === "DOCTOR") {
       where = { userId };
+    } else if (activeRole === "PATIENT" || activeRole === "RECEPTIONIST") {
+      // Patients and receptionists only see active doctors
+      where = { deletedAt: null, isActive: true };
     }
 
     const doctors = await prisma.doctor.findMany({

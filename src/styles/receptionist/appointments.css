@@ -1,0 +1,451 @@
+/* ─── Appointments Page ──────────────────────────────────────────── */
+.appointments-container {
+  margin: 0;
+  padding: 24px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f8fafc;
+  min-height: calc(100vh - 64px);
+}
+
+.appointments-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.appointments-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* ─── Create Button ─────────────────────────────────── */
+.create-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.28);
+  min-width: 160px;
+}
+.create-btn:hover { opacity: 0.9; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.38); }
+
+/* ─── Filters ───────────────────────────────────────── */
+.appointments-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-input,
+.date-input {
+  padding: 0.6rem 0.875rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #0f172a;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  outline: none;
+}
+.search-input { flex: 1; }
+.search-input:focus,
+.date-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+/* ─── Table Wrapper ─────────────────────────────────── */
+.appointments-table-wrapper {
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+/* ─── Table ─────────────────────────────────────────── */
+.appointments-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.appointments-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.thead-tr,
+.appointments-table thead tr {
+  background: #f8fafc;
+}
+
+.appointments-table th {
+  background: #f8fafc;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+.appointments-table td {
+  padding: 13px 14px;
+  text-align: center;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.875rem;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.appointments-table tbody tr {
+  transition: background 0.15s;
+}
+.appointments-table tbody tr:hover,
+.row-highlighted td {
+  background: #f8f9ff !important;
+}
+
+/* ─── Patient Name Cell ─────────────────────────────── */
+.patient-name-cell { cursor: pointer; }
+.patient-name-hover {
+  display: inline-block;
+  font-weight: 600;
+  color: #4f46e5;
+  transition: color 0.15s;
+}
+.patient-name-cell:hover .patient-name-hover { color: #6366f1; text-decoration: underline; }
+
+/* ─── Status Badges ─────────────────────────────────── */
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 96px;
+  white-space: nowrap;
+  letter-spacing: 0.01em;
+}
+
+.status.scheduled   { background: #eff6ff; color: #1d4ed8; border: 1px solid #bfdbfe; }
+.status.completed   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.status.in-progress,
+.status.in_progress { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.status.cancelled,
+.status.canceled    { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+.status.checked-in,
+.status.checked_in  { background: #ecfeff; color: #0e7490; border: 1px solid #a5f3fc; }
+.status.no-show,
+.status.no_show     { background: #fefce8; color: #854d0e; border: 1px solid #fef08a; }
+.status.created     { background: #f8fafc; color: #475569; border: 1px solid #cbd5e1; }
+
+/* ─── Payment Badges ─────────────────────────────────── */
+.payment_status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 70px;
+  white-space: nowrap;
+}
+.payment_status.paid    { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.payment_status.pending { background: #fffbeb; color: #b45309; border: 1px solid #fde68a; }
+.payment_status.unpaid,
+.payment_status.failed  { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* ─── Remarks / Notes ────────────────────────────────── */
+.remarks-snippet {
+  font-size: 0.8rem;
+  color: #64748b;
+  max-width: 160px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
+  vertical-align: middle;
+}
+.view-notes-link {
+  background: none;
+  border: none;
+  color: #6366f1;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+  text-decoration: underline;
+  transition: color 0.15s;
+}
+.view-notes-link:hover { color: #4f46e5; }
+.no-notes { color: #94a3b8; font-size: 0.8rem; font-style: italic; }
+
+/* ─── Action Button / Dropdown ───────────────────────── */
+.dropdown-container { position: relative; }
+
+.patient-action-btn {
+  background: none;
+  border: 1.5px solid #e2e8f0;
+  color: #64748b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+.patient-action-btn:hover {
+  background: #f1f5f9;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  z-index: 200;
+  min-width: 168px;
+  overflow: hidden;
+}
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition: background 0.15s;
+}
+.dropdown-menu button:hover { background: #f8f9ff; color: #4f46e5; }
+.dropdown-menu button + button { border-top: 1px solid #f1f5f9; }
+
+/* ─── Modal Overlay ──────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+  backdrop-filter: blur(2px);
+}
+
+/* ─── Notes / Status Modal Card ──────────────────────── */
+.notes-modal {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(15, 23, 42, 0.18);
+  width: 420px;
+  max-width: 95vw;
+  overflow: hidden;
+}
+
+.notes-modal h3 {
+  padding: 18px 22px 14px;
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: #0f172a;
+  border-bottom: 1px solid #f1f5f9;
+  background: #fff;
+}
+
+.notes-modal .modal-body {
+  padding: 18px 22px;
+}
+
+.notes-textarea {
+  width: 100%;
+  height: 130px;
+  padding: 10px 12px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-family: inherit;
+  color: #1e293b;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  box-sizing: border-box;
+}
+.notes-textarea:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.notes-display {
+  min-height: 90px;
+  padding: 12px 14px;
+  background: #f8fafc;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  color: #334155;
+  white-space: pre-wrap;
+  line-height: 1.6;
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: 14px 22px 18px;
+  border-top: 1px solid #f1f5f9;
+}
+
+/* ─── Modal Buttons ──────────────────────────────────── */
+.save-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  border: none;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 90px;
+  transition: opacity 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.22);
+}
+.save-btn:hover:not(:disabled) { opacity: 0.88; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.32); }
+.save-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+.cancel-btn,
+.close-btn {
+  background: #f1f5f9;
+  color: #475569;
+  border: 1.5px solid #e2e8f0;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+  transition: background 0.18s, color 0.18s;
+}
+.cancel-btn:hover,
+.close-btn:hover { background: #e2e8f0; color: #1e293b; }
+
+.edit-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1.5px solid #bfdbfe;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+  transition: background 0.18s;
+}
+.edit-btn:hover { background: #dbeafe; }
+
+.delete-btn {
+  background: #fef2f2;
+  color: #b91c1c;
+  border: 1.5px solid #fecaca;
+  padding: 0.5rem 1.2rem;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  min-width: 80px;
+  transition: background 0.18s;
+}
+.delete-btn:hover { background: #fee2e2; }
+
+/* ─── View Button (table) ────────────────────────────── */
+.view-btn {
+  background: none;
+  border: none;
+  color: #6366f1;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 0.15s;
+}
+.view-btn:hover { color: #4f46e5; text-decoration: underline; }
+
+/* ─── Hover Tooltip ──────────────────────────────────── */
+.patient-tooltip {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.14);
+  pointer-events: none;
+  z-index: 1000;
+  animation: tooltipFadeIn 0.18s ease;
+}
+.patient-tooltip strong { color: #0f172a; }
+
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Status Update Modal extras ────────────────────── */
+.status-current-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 12px;
+  border-radius: 99px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: #f1f5f9;
+  color: #475569;
+  border: 1px solid #e2e8f0;
+  margin-bottom: 16px;
+}
+
+.status-select {
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1.5px solid #e2e8f0;
+  font-size: 0.875rem;
+  color: #1e293b;
+  background: #fff;
+  outline: none;
+  margin-bottom: 4px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+  cursor: pointer;
+  appearance: auto;
+}
+.status-select:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}

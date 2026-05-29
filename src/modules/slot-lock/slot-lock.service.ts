@@ -18,9 +18,7 @@ export async function acquireSlotLock(params:{
     const redisLock=await redis.set(
         lockKey,
         params.lockedBy,
-        "EX",
-        LOCK_TTL_SECONDS,
-        "NX"
+        { ex: LOCK_TTL_SECONDS, nx: true }
     )
 
     if(!redisLock){

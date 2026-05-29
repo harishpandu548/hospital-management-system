@@ -19,6 +19,13 @@ enum UserStatus {
   DELETED
 }
 
+enum ConsultationStatus {
+  PENDING
+  ACTIVE
+  ENDED
+  DECLINED
+}
+
 enum AppointmentStatus {
   CREATED
   SCHEDULED
@@ -118,11 +125,16 @@ model Patient {
   city    String?
   state   String?
 
-  medicalNotes String?
+  medicalNotes  String?
+  medicalFiles  Json?   // [{url, name, type, uploadedAt}]
+
+  relation String @default("SELF") // SELF, SPOUSE, CHILD, PARENT, SIBLING, OTHER
 
   createdBy String //receptionist / admin / patient userId
 
-  appointments Appointment[]
+  appointments        Appointment[]
+  consultationRooms   ConsultationRoom[]
+  consultationSlots   ConsultationSlot[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -145,8 +157,10 @@ model Doctor {
 
   isActive Boolean @default(true)
 
-  appointments      Appointment[]
-  availabilityRules DoctorAvailabilityRule[]
+  appointments        Appointment[]
+  availabilityRules   DoctorAvailabilityRule[]
+  consultationRooms   ConsultationRoom[]
+  consultationSlots   ConsultationSlot[]
 
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
@@ -256,4 +270,79 @@ model AuditLog {
   performedBy String
 
   createdAt DateTime @default(now())
+}
+
+//-------------------------------consultation slot models------------------------------------------------
+
+model ConsultationSlot {
+  id        String   @id @default(cuid())
+  doctorId  String
+  doctor    Doctor   @relation(fields: [doctorId], references: [id])
+
+  slotDate  DateTime
+  startTime DateTime
+  endTime   DateTime
+
+  isBooked  Boolean  @default(false)
+  patientId String?
+  patient   Patient? @relation(fields: [patientId], references: [id])
+
+  roomId    String?          @unique
+  room      ConsultationRoom? @relation(fields: [roomId], references: [id])
+
+  createdAt DateTime @default(now())
+
+  @@index([doctorId, slotDate])
+  @@index([isBooked])
+}
+
+//-------------------------------consultation & video call models------------------------------------------------
+
+model ConsultationRoom {
+  id        String             @id @default(cuid())
+  patientId String
+  doctorId  String
+  status    ConsultationStatus @default(PENDING)
+  roomCode  String             @unique
+
+  patient  Patient          @relation(fields: [patientId], references: [id])
+  doctor   Doctor           @relation(fields: [doctorId], references: [id])
+  messages ChatMessage[]
+  signals  WebRTCSignal[]
+  slot     ConsultationSlot?
+
+  createdAt DateTime  @default(now())
+  endedAt   DateTime?
+
+  @@index([patientId])
+  @@index([doctorId])
+  @@index([status])
+}
+
+model ChatMessage {
+  id         String           @id @default(cuid())
+  roomId     String
+  room       ConsultationRoom @relation(fields: [roomId], references: [id])
+  senderId   String
+  senderRole String
+  content    String?
+  fileUrl    String?
+  fileName   String?
+  fileType   String?
+  createdAt  DateTime         @default(now())
+
+  @@index([roomId])
+}
+
+model WebRTCSignal {
+  id        String           @id @default(cuid())
+  roomId    String
+  room      ConsultationRoom @relation(fields: [roomId], references: [id])
+  fromRole  String
+  type      String
+  payload   String
+  processed Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@index([roomId, processed])
 }

@@ -1,0 +1,219 @@
+/* ─── Doctors Page ───────────────────────────────────────────────── */
+.doctor-container {
+  padding: 24px;
+  font-family: 'Segoe UI', system-ui, sans-serif;
+  background: #f8fafc;
+  min-height: calc(100vh - 64px);
+}
+
+.doctor-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.doctor-header h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #0f172a;
+  margin: 0;
+}
+
+/* ─── Add Button ─────────────────────────────────── */
+.add-btn {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #fff;
+  border: none;
+  padding: 0.55rem 1.25rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: opacity 0.18s, box-shadow 0.18s;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.28);
+  min-width: 130px;
+}
+.add-btn:hover { opacity: 0.9; box-shadow: 0 4px 14px rgba(99, 102, 241, 0.38); }
+
+/* ─── Filters ────────────────────────────────────── */
+.doctor-filters {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.search-input {
+  flex: 1;
+  padding: 0.6rem 0.875rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.search-input:focus {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+
+.date-input {
+  padding: 0.6rem 0.875rem;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  font-size: 0.875rem;
+  color: #0f172a;
+  outline: none;
+  transition: border-color 0.18s;
+}
+.date-input:focus { border-color: #6366f1; }
+
+/* ─── Table Wrapper ──────────────────────────────── */
+.doctor-table-wrapper {
+  max-height: calc(100vh - 260px);
+  overflow-y: auto;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.06);
+}
+
+/* ─── Table ──────────────────────────────────────── */
+.doctor-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.doctor-table thead {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.doctor-table th {
+  background: #f8fafc;
+  padding: 12px 14px;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  border-bottom: 1.5px solid #e2e8f0;
+}
+
+.doctor-table td {
+  padding: 13px 14px;
+  text-align: center;
+  border-top: 1px solid #f1f5f9;
+  font-size: 0.875rem;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.doctor-table tbody tr {
+  transition: background 0.15s;
+}
+.doctor-table tbody tr:hover,
+.row-highlighted td {
+  background: #f8f9ff !important;
+}
+
+/* ─── Doctor Name Cell ───────────────────────────── */
+.doctor-name-cell { cursor: pointer; }
+.doctor-name-hover {
+  display: inline-block;
+  font-weight: 600;
+  color: #4f46e5;
+  transition: color 0.15s;
+}
+.doctor-name-cell:hover .doctor-name-hover { color: #6366f1; text-decoration: underline; }
+
+/* ─── Status Badges ──────────────────────────────── */
+.status {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 3px 10px;
+  border-radius: 99px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  min-width: 88px;
+  white-space: nowrap;
+}
+.status.available   { background: #f0fdf4; color: #15803d; border: 1px solid #bbf7d0; }
+.status.unavailable { background: #fef2f2; color: #b91c1c; border: 1px solid #fecaca; }
+
+/* ─── Action Button / Dropdown ───────────────────── */
+.dropdown-container { position: relative; }
+
+.action-btn {
+  background: none;
+  border: 1.5px solid #e2e8f0;
+  color: #64748b;
+  font-size: 1.1rem;
+  cursor: pointer;
+  padding: 4px 9px;
+  border-radius: 6px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  line-height: 1;
+}
+.action-btn:hover {
+  background: #f1f5f9;
+  color: #4f46e5;
+  border-color: #c7d2fe;
+}
+
+.dropdown-menu {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.12);
+  z-index: 200;
+  min-width: 140px;
+  overflow: hidden;
+}
+.dropdown-menu button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  text-align: left;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 0.875rem;
+  color: #1e293b;
+  transition: background 0.15s;
+}
+.dropdown-menu button:hover { background: #f8f9ff; color: #4f46e5; }
+.dropdown-menu button + button { border-top: 1px solid #f1f5f9; }
+
+/* ─── Hover Tooltip ──────────────────────────────── */
+.doctor-tooltip {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 14px 18px;
+  box-shadow: 0 8px 32px rgba(15, 23, 42, 0.14);
+  pointer-events: none;
+  z-index: 1000;
+  animation: tooltipFadeIn 0.18s ease;
+}
+.doctor-tooltip strong { color: #0f172a; }
+
+@keyframes tooltipFadeIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}

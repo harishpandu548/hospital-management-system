@@ -1,0 +1,1949 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>HMS — Complete Flow Diagrams</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      background: #0d1117;
+      color: #e6edf3;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1f2e 0%, #0d1117 100%);
+      border-bottom: 1px solid #21262d;
+      padding: 28px 40px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    header .logo {
+      width: 44px; height: 44px;
+      background: linear-gradient(135deg, #2563eb, #7c3aed);
+      border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px;
+    }
+
+    header h1 { font-size: 22px; font-weight: 700; color: #f0f6fc; }
+    header p  { font-size: 13px; color: #8b949e; margin-top: 2px; }
+
+    nav {
+      background: #161b22;
+      border-bottom: 1px solid #21262d;
+      padding: 0 40px;
+      display: flex; gap: 4px; overflow-x: auto;
+    }
+
+    nav a {
+      color: #8b949e; text-decoration: none;
+      padding: 14px 18px; font-size: 13px; font-weight: 500;
+      border-bottom: 2px solid transparent;
+      white-space: nowrap; transition: all .2s;
+    }
+    nav a:hover { color: #e6edf3; }
+    nav a.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+
+    main { padding: 40px; max-width: 1400px; margin: 0 auto; }
+
+    .section {
+      margin-bottom: 60px;
+      scroll-margin-top: 80px;
+    }
+
+    .section-header {
+      display: flex; align-items: center; gap: 14px;
+      margin-bottom: 28px;
+    }
+
+    .section-badge {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 18px; flex-shrink: 0;
+    }
+
+    .section-header h2 {
+      font-size: 20px; font-weight: 700; color: #f0f6fc;
+    }
+
+    .section-header p {
+      font-size: 13px; color: #8b949e; margin-top: 3px;
+    }
+
+    .card {
+      background: #161b22;
+      border: 1px solid #21262d;
+      border-radius: 12px;
+      padding: 32px;
+      margin-bottom: 20px;
+      overflow-x: auto;
+    }
+
+    .card h3 {
+      font-size: 14px; font-weight: 600;
+      color: #8b949e; text-transform: uppercase;
+      letter-spacing: .06em; margin-bottom: 24px;
+    }
+
+    .mermaid {
+      display: flex; justify-content: center;
+      min-height: 100px;
+    }
+
+    .mermaid svg {
+      max-width: 100%;
+      height: auto !important;
+    }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+    @media(max-width: 900px) { .grid-2 { grid-template-columns: 1fr; } }
+
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 12px;
+      margin-bottom: 20px;
+    }
+    .legend-item {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 12px; color: #8b949e;
+    }
+    .legend-dot {
+      width: 12px; height: 12px; border-radius: 3px;
+    }
+
+    .info-box {
+      background: #0d1f3c;
+      border: 1px solid #1f4f8f;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #79c0ff;
+      line-height: 1.6;
+    }
+
+    .portal-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+    @media(max-width: 900px) { .portal-grid { grid-template-columns: repeat(2, 1fr); } }
+
+    .portal-card {
+      border-radius: 10px;
+      padding: 20px;
+      border: 1px solid;
+    }
+    .portal-card.admin    { background: #1a0d2e; border-color: #7c3aed; }
+    .portal-card.doctor   { background: #0d1f3c; border-color: #2563eb; }
+    .portal-card.patient  { background: #0d2818; border-color: #16a34a; }
+    .portal-card.recep    { background: #2d1a00; border-color: #d97706; }
+
+    .portal-card .icon { font-size: 28px; margin-bottom: 10px; }
+    .portal-card h3 { font-size: 14px; font-weight: 700; margin-bottom: 8px; }
+    .portal-card ul { font-size: 12px; color: #8b949e; list-style: none; }
+    .portal-card ul li { padding: 3px 0; }
+    .portal-card ul li::before { content: '→ '; }
+
+    .admin-card h3   { color: #a78bfa; }
+    .doctor-card h3  { color: #60a5fa; }
+    .patient-card h3 { color: #4ade80; }
+    .recep-card h3   { color: #fbbf24; }
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🏥</div>
+  <div>
+    <h1>Hospital Management System — Flow Diagrams</h1>
+    <p>Complete visual documentation of all portals, data flows, and system architecture</p>
+  </div>
+</header>
+
+<nav id="nav">
+  <a href="#arch" class="active">Architecture</a>
+  <a href="#db">Database</a>
+  <a href="#auth">Auth Flow</a>
+  <a href="#patient">Patient Portal</a>
+  <a href="#doctor">Doctor Portal</a>
+  <a href="#receptionist">Receptionist Portal</a>
+  <a href="#admin">Admin Portal</a>
+  <a href="#booking">Appointment Booking</a>
+  <a href="#statemachine">State Machine</a>
+  <a href="#jobs">Background Jobs</a>
+  <a href="#connections">Portal Connections</a>
+</nav>
+
+<main>
+
+  <!-- ========== PORTAL OVERVIEW ========== -->
+  <div class="section" id="arch">
+    <div class="section-header">
+      <div class="section-badge" style="background:#1a1f3c">🏗️</div>
+      <div>
+        <h2>1. System Architecture Overview</h2>
+        <p>How all layers of the HMS are structured and connected</p>
+      </div>
+    </div>
+
+    <div class="portal-grid">
+      <div class="portal-card admin">
+        <div class="icon">👑</div>
+        <h3>Admin Portal</h3>
+        <ul>
+          <li>Manage all users</li>
+          <li>Create doctors</li>
+          <li>Assign roles</li>
+          <li>View audit logs</li>
+          <li>System settings</li>
+        </ul>
+      </div>
+      <div class="portal-card doctor">
+        <div class="icon">🩺</div>
+        <h3>Doctor Portal</h3>
+        <ul>
+          <li>View appointments</li>
+          <li>Update status</li>
+          <li>View patients</li>
+          <li>Manage schedule</li>
+        </ul>
+      </div>
+      <div class="portal-card patient">
+        <div class="icon">🧑</div>
+        <h3>Patient Portal</h3>
+        <ul>
+          <li>Self-register</li>
+          <li>Browse doctors</li>
+          <li>Book appointments</li>
+          <li>Track appointments</li>
+          <li>Leave reviews</li>
+        </ul>
+      </div>
+      <div class="portal-card recep">
+        <div class="icon">📋</div>
+        <h3>Receptionist Portal</h3>
+        <ul>
+          <li>Add patients</li>
+          <li>Book on behalf</li>
+          <li>Manage schedule</li>
+          <li>Generate reports</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- FULL SYSTEM ARCHITECTURE — pure HTML, no Mermaid -->
+    <div class="card" style="padding:36px;">
+      <h3 style="margin-bottom:32px;">Full System Architecture — 5 Clear Layers</h3>
+
+      <div style="display:flex; flex-direction:column; align-items:center; gap:0; font-family:'Segoe UI',sans-serif;">
+
+        <!-- ── LAYER LABEL ── -->
+        <div style="width:100%; max-width:860px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">
+          Layer 1 — Frontend (Browser)
+        </div>
+
+        <!-- ── LAYER 1: 4 PORTALS ── -->
+        <div style="display:flex; gap:12px; width:100%; max-width:860px; justify-content:stretch;">
+          <div style="flex:1; background:#0d2818; border:2px solid #16a34a; border-radius:10px; padding:14px 10px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">🧑</div>
+            <div style="font-weight:700; color:#4ade80; font-size:13px;">Patient Portal</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">/home · /DoctorsAppointment<br/>/my-appointments · /signup</div>
+          </div>
+          <div style="flex:1; background:#0d1f3c; border:2px solid #2563eb; border-radius:10px; padding:14px 10px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">🩺</div>
+            <div style="font-weight:700; color:#60a5fa; font-size:13px;">Doctor Portal</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">/doctor · /doctor/appointments<br/>/doctor/patients</div>
+          </div>
+          <div style="flex:1; background:#2d1a00; border:2px solid #d97706; border-radius:10px; padding:14px 10px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">📋</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:13px;">Receptionist Portal</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">/receptionist · /book-appointment<br/>/patients · /reports</div>
+          </div>
+          <div style="flex:1; background:#1a0d2e; border:2px solid #7c3aed; border-radius:10px; padding:14px 10px; text-align:center;">
+            <div style="font-size:22px; margin-bottom:6px;">👑</div>
+            <div style="font-weight:700; color:#a78bfa; font-size:13px;">Admin Portal</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">/admin · /admin/doctors<br/>/admin/roles · /audit-logs</div>
+          </div>
+        </div>
+
+        <!-- ARROW -->
+        <div style="display:flex; flex-direction:column; align-items:center; margin:2px 0;">
+          <div style="width:2px; height:20px; background:#374151;"></div>
+          <div style="color:#6b7280; font-size:11px; background:#161b22; padding:3px 10px; border-radius:20px; border:1px solid #374151;">HTTP Request + JWT Token</div>
+          <div style="width:2px; height:20px; background:#374151;"></div>
+          <div style="width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid #374151;"></div>
+        </div>
+
+        <!-- ── LAYER LABEL ── -->
+        <div style="width:100%; max-width:860px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">
+          Layer 2 — API Routes (Next.js Server — /api/**)
+        </div>
+
+        <!-- ── LAYER 2: API ROUTES ── -->
+        <div style="width:100%; max-width:860px; background:#0f1923; border:2px solid #2563eb; border-radius:10px; padding:20px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+            <div style="background:#161b22; border:1px solid #21262d; border-radius:8px; padding:10px 14px; text-align:center; min-width:120px;">
+              <div style="color:#58a6ff; font-weight:700; font-size:12px;">/api/auth</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">login<br/>signup<br/>change-password</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #21262d; border-radius:8px; padding:10px 14px; text-align:center; min-width:120px;">
+              <div style="color:#58a6ff; font-weight:700; font-size:12px;">/api/doctors</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">list · create<br/>slots<br/>availability</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #21262d; border-radius:8px; padding:10px 14px; text-align:center; min-width:120px;">
+              <div style="color:#58a6ff; font-weight:700; font-size:12px;">/api/patients</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">list · create<br/>get · update</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #21262d; border-radius:8px; padding:10px 14px; text-align:center; min-width:120px;">
+              <div style="color:#58a6ff; font-weight:700; font-size:12px;">/api/appointments</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">list · create<br/>status · cancel</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #21262d; border-radius:8px; padding:10px 14px; text-align:center; min-width:120px;">
+              <div style="color:#58a6ff; font-weight:700; font-size:12px;">/api/admin</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">users · roles<br/>create-user</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #21262d; border-radius:8px; padding:10px 14px; text-align:center; min-width:120px;">
+              <div style="color:#58a6ff; font-weight:700; font-size:12px;">/api/audit-logs</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">read only<br/>admin access</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARROW -->
+        <div style="display:flex; flex-direction:column; align-items:center; margin:2px 0;">
+          <div style="width:2px; height:20px; background:#374151;"></div>
+          <div style="color:#6b7280; font-size:11px; background:#161b22; padding:3px 10px; border-radius:20px; border:1px solid #374151;">Every request passes through Core Services</div>
+          <div style="width:2px; height:20px; background:#374151;"></div>
+          <div style="width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid #374151;"></div>
+        </div>
+
+        <!-- ── LAYER LABEL ── -->
+        <div style="width:100%; max-width:860px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">
+          Layer 3 — Core Services (Business Logic)
+        </div>
+
+        <!-- ── LAYER 3: CORE SERVICES ── -->
+        <div style="width:100%; max-width:860px; background:#0f1923; border:2px solid #7c3aed; border-radius:10px; padding:20px;">
+          <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:center;">
+            <div style="background:#1a0d2e; border:1px solid #7c3aed; border-radius:8px; padding:12px 16px; text-align:center; flex:1; min-width:160px;">
+              <div style="font-size:18px; margin-bottom:6px;">🔑</div>
+              <div style="color:#a78bfa; font-weight:700; font-size:12px;">JWT Auth</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">Verifies token on every request<br/><code style="color:#8b949e;">lib/jwt.ts</code></div>
+            </div>
+            <div style="background:#1a0d2e; border:1px solid #7c3aed; border-radius:8px; padding:12px 16px; text-align:center; flex:1; min-width:160px;">
+              <div style="font-size:18px; margin-bottom:6px;">🛡️</div>
+              <div style="color:#a78bfa; font-weight:700; font-size:12px;">Permission Check</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">Checks role can do the action<br/><code style="color:#8b949e;">appointment.permissions.ts</code></div>
+            </div>
+            <div style="background:#1a0d2e; border:1px solid #7c3aed; border-radius:8px; padding:12px 16px; text-align:center; flex:1; min-width:160px;">
+              <div style="font-size:18px; margin-bottom:6px;">🔄</div>
+              <div style="color:#a78bfa; font-weight:700; font-size:12px;">State Machine</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">Controls valid status transitions<br/><code style="color:#8b949e;">appointment.state-machine.ts</code></div>
+            </div>
+            <div style="background:#1a0d2e; border:1px solid #7c3aed; border-radius:8px; padding:12px 16px; text-align:center; flex:1; min-width:160px;">
+              <div style="font-size:18px; margin-bottom:6px;">📦</div>
+              <div style="color:#a78bfa; font-weight:700; font-size:12px;">Appointment Service</div>
+              <div style="color:#6b7280; font-size:11px; margin-top:4px;">Slot validation + DB transaction<br/><code style="color:#8b949e;">appointment.service.ts</code></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ARROW splits into two -->
+        <div style="display:flex; flex-direction:column; align-items:center; margin:2px 0;">
+          <div style="width:2px; height:16px; background:#374151;"></div>
+          <div style="color:#6b7280; font-size:11px; background:#161b22; padding:3px 10px; border-radius:20px; border:1px solid #374151;">reads &amp; writes data</div>
+          <div style="width:2px; height:16px; background:#374151;"></div>
+          <div style="width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid #374151;"></div>
+        </div>
+
+        <!-- ── LAYER LABEL ── -->
+        <div style="width:100%; max-width:860px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">
+          Layer 4 — Storage
+        </div>
+
+        <!-- ── LAYER 4: STORAGE ── -->
+        <div style="display:flex; gap:16px; width:100%; max-width:860px;">
+          <div style="flex:1; background:#0d2818; border:2px solid #16a34a; border-radius:10px; padding:20px; text-align:center;">
+            <div style="font-size:28px; margin-bottom:8px;">🗄️</div>
+            <div style="font-weight:700; color:#4ade80; font-size:14px;">PostgreSQL</div>
+            <div style="color:#6b7280; font-size:12px; margin-top:6px;">via Prisma ORM</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:8px; line-height:1.7;">Stores all permanent data<br/>Users · Doctors · Patients<br/>Appointments · Audit Logs</div>
+          </div>
+          <div style="flex:1; background:#2d1a00; border:2px solid #d97706; border-radius:10px; padding:20px; text-align:center;">
+            <div style="font-size:28px; margin-bottom:8px;">⚡</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:14px;">Upstash Redis</div>
+            <div style="color:#6b7280; font-size:12px; margin-top:6px;">In-memory, cloud hosted</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:8px; line-height:1.7;">Two jobs:<br/>1. Slot Locks (30s TTL)<br/>2. Background Job Queue</div>
+          </div>
+        </div>
+
+        <!-- ARROW from Redis only -->
+        <div style="display:flex; width:100%; max-width:860px; justify-content:flex-end; padding-right:calc(50% - 20px);">
+          <div style="display:flex; flex-direction:column; align-items:center;">
+            <div style="width:2px; height:16px; background:#374151;"></div>
+            <div style="color:#6b7280; font-size:11px; background:#161b22; padding:3px 10px; border-radius:20px; border:1px solid #374151;">dequeues jobs every 1s</div>
+            <div style="width:2px; height:16px; background:#374151;"></div>
+            <div style="width:0; height:0; border-left:8px solid transparent; border-right:8px solid transparent; border-top:10px solid #374151;"></div>
+          </div>
+        </div>
+
+        <!-- ── LAYER LABEL ── -->
+        <div style="width:100%; max-width:860px; text-align:left; font-size:11px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.08em; margin-bottom:8px;">
+          Layer 5 — Background Jobs (runs separately, non-blocking)
+        </div>
+
+        <!-- ── LAYER 5: BACKGROUND JOBS ── -->
+        <div style="display:flex; gap:12px; width:100%; max-width:860px;">
+          <div style="flex:1; background:#161b22; border:2px solid #d97706; border-radius:10px; padding:16px; text-align:center;">
+            <div style="font-size:20px; margin-bottom:6px;">📨</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:12px;">Job Queue</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;"><code>jobs/queue.ts</code><br/>API pushes jobs here</div>
+          </div>
+          <div style="flex:1; background:#161b22; border:2px solid #d97706; border-radius:10px; padding:16px; text-align:center;">
+            <div style="font-size:20px; margin-bottom:6px;">🔔</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:12px;">APPOINTMENT_CREATED</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">Send confirmation</div>
+          </div>
+          <div style="flex:1; background:#161b22; border:2px solid #d97706; border-radius:10px; padding:16px; text-align:center;">
+            <div style="font-size:20px; margin-bottom:6px;">⏰</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:12px;">APPOINTMENT_REMINDER</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">24h before + 2h before</div>
+          </div>
+          <div style="flex:1; background:#161b22; border:2px solid #d97706; border-radius:10px; padding:16px; text-align:center;">
+            <div style="font-size:20px; margin-bottom:6px;">❌</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:12px;">APPOINTMENT_CANCELLED</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">Send cancellation notice</div>
+          </div>
+          <div style="flex:1; background:#161b22; border:2px solid #d97706; border-radius:10px; padding:16px; text-align:center;">
+            <div style="font-size:20px; margin-bottom:6px;">🧹</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:12px;">SLOT_LOCK_CLEANUP</div>
+            <div style="color:#6b7280; font-size:11px; margin-top:4px;">Remove expired locks from DB</div>
+          </div>
+        </div>
+
+      </div><!-- end flex column -->
+    </div>
+
+    <div class="card">
+      <h3>Technology Stack</h3>
+      <div class="mermaid">
+graph LR
+    subgraph Frontend["Frontend Layer"]
+        NX["Next.js 16<br/>App Router"]
+        RC["React 19<br/>Server + Client Components"]
+        TW["Tailwind CSS v4<br/>Styling"]
+        FM["Framer Motion<br/>Animations"]
+        CTX["React Context API<br/>State Management"]
+    end
+    subgraph Backend["Backend Layer"]
+        API["API Routes<br/>route.ts files"]
+        PR["Prisma ORM<br/>DB Access"]
+        BC["bcryptjs<br/>Password Hashing"]
+        JW["jsonwebtoken<br/>JWT Auth"]
+        ZD["Zod v4<br/>Validation"]
+    end
+    subgraph Infra["Infrastructure"]
+        PG[("PostgreSQL<br/>Main Database")]
+        UP["Upstash Redis<br/>Queue + Locks"]
+        JP["jspdf<br/>PDF Reports"]
+    end
+    NX --> API
+    RC --> NX
+    TW --> RC
+    FM --> RC
+    CTX --> RC
+    API --> PR --> PG
+    API --> BC & JW & ZD
+    API --> UP
+
+    style Frontend fill:#0d1f3c,stroke:#2563eb,color:#e6edf3
+    style Backend fill:#1a0d2e,stroke:#7c3aed,color:#e6edf3
+    style Infra fill:#0d2818,stroke:#16a34a,color:#e6edf3
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== DATABASE ========== -->
+  <div class="section" id="db">
+    <div class="section-header">
+      <div class="section-badge" style="background:#0d2818">🗄️</div>
+      <div>
+        <h2>2. Database Schema — All Tables, Fields & Relationships</h2>
+        <p>12 tables split into 4 domain groups — each table shows every field with its type and an example value</p>
+      </div>
+    </div>
+
+    <!-- OVERVIEW -->
+    <div class="card">
+      <h3>Overview — 4 Domain Groups (12 tables total)</h3>
+      <div class="mermaid">
+flowchart LR
+    subgraph A["🔐  AUTH & RBAC  (5 tables)"]
+        direction TB
+        U["User"]
+        UR["UserRole\njunction"]
+        R["Role"]
+        RP["RolePermission\njunction"]
+        P["Permission"]
+        U --> UR --> R --> RP --> P
+    end
+    subgraph B["👥  PEOPLE  (2 tables)"]
+        direction TB
+        PT["Patient"]
+        DC["Doctor"]
+    end
+    subgraph C["📅  SCHEDULING  (3 tables)"]
+        direction TB
+        DAR["DoctorAvailabilityRule"]
+        AP["Appointment"]
+        SL["AppointmentSlotLock"]
+    end
+    subgraph D["📜  TRACKING  (2 tables)"]
+        direction TB
+        ASL["AppointmentStatusLog"]
+        AL["AuditLog"]
+    end
+
+    A -->|"User links to Patient/Doctor"| B
+    B -->|"Doctor defines rules\nPatient books appts"| C
+    C -->|"Appointment is tracked"| D
+
+    style A   fill:#1a0d2e,stroke:#7c3aed,color:#e6edf3
+    style B   fill:#0d1f3c,stroke:#2563eb,color:#e6edf3
+    style C   fill:#2d1a00,stroke:#d97706,color:#e6edf3
+    style D   fill:#0d2818,stroke:#16a34a,color:#e6edf3
+    style U   fill:#161b22,stroke:#7c3aed,color:#a78bfa
+    style UR  fill:#161b22,stroke:#7c3aed,color:#a78bfa
+    style R   fill:#161b22,stroke:#7c3aed,color:#a78bfa
+    style RP  fill:#161b22,stroke:#7c3aed,color:#a78bfa
+    style P   fill:#161b22,stroke:#7c3aed,color:#a78bfa
+    style PT  fill:#161b22,stroke:#2563eb,color:#60a5fa
+    style DC  fill:#161b22,stroke:#2563eb,color:#60a5fa
+    style DAR fill:#161b22,stroke:#d97706,color:#fbbf24
+    style AP  fill:#161b22,stroke:#d97706,color:#fbbf24
+    style SL  fill:#161b22,stroke:#d97706,color:#fbbf24
+    style ASL fill:#161b22,stroke:#16a34a,color:#4ade80
+    style AL  fill:#161b22,stroke:#16a34a,color:#4ade80
+      </div>
+    </div>
+
+    <!-- ── GROUP 1: AUTH & RBAC ── -->
+    <div style="margin:28px 0 10px; font-size:13px; font-weight:700; color:#a78bfa; letter-spacing:.08em; text-transform:uppercase;">
+      🔐 Group 1 — Auth &amp; RBAC Tables
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px;">
+
+      <!-- User -->
+      <div style="background:#161b22; border:1px solid #7c3aed; border-radius:10px; overflow:hidden;">
+        <div style="background:#1a0d2e; padding:12px 16px; font-weight:700; color:#a78bfa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>User</span><span style="font-weight:400; color:#6b7280; font-size:11px;">auth.users</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">uuid-1234</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">phone</td><td style="padding:7px 12px; color:#58a6ff;">String UNIQUE</td><td style="padding:7px 12px; color:#8b949e;">+919876543210</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">email</td><td style="padding:7px 12px; color:#58a6ff;">String?</td><td style="padding:7px 12px; color:#8b949e;">john@gmail.com</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">password</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">$2b$10$hash...</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">status</td><td style="padding:7px 12px; color:#58a6ff;">Enum</td><td style="padding:7px 12px; color:#4ade80;">ACTIVE</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">createdAt</td><td style="padding:7px 12px; color:#58a6ff;">DateTime</td><td style="padding:7px 12px; color:#8b949e;">2026-05-07 10:00</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">status values: ACTIVE · SUSPENDED · DELETED</div>
+      </div>
+
+      <!-- Role -->
+      <div style="background:#161b22; border:1px solid #7c3aed; border-radius:10px; overflow:hidden;">
+        <div style="background:#1a0d2e; padding:12px 16px; font-weight:700; color:#a78bfa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>Role</span><span style="font-weight:400; color:#6b7280; font-size:11px;">roles</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">role-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">name</td><td style="padding:7px 12px; color:#58a6ff;">String UNIQUE</td><td style="padding:7px 12px; color:#fbbf24;">RECEPTIONIST</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">4 roles: ADMIN · DOCTOR · PATIENT · RECEPTIONIST</div>
+      </div>
+
+      <!-- Permission -->
+      <div style="background:#161b22; border:1px solid #7c3aed; border-radius:10px; overflow:hidden;">
+        <div style="background:#1a0d2e; padding:12px 16px; font-weight:700; color:#a78bfa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>Permission</span><span style="font-weight:400; color:#6b7280; font-size:11px;">permissions</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">perm-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">code</td><td style="padding:7px 12px; color:#58a6ff;">String UNIQUE</td><td style="padding:7px 12px; color:#fbbf24;">APPOINTMENT_CREATE</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">13 codes: APPOINTMENT_CREATE · STATUS_UPDATE · STATUS_OVERRIDE · DOCTOR_CREATE · PATIENT_CREATE · AVAILABILITY_MANAGE · USER_CREATE · ROLE_ASSIGN · AUDIT_VIEW ...</div>
+      </div>
+
+      <!-- UserRole -->
+      <div style="background:#161b22; border:1px solid #7c3aed; border-radius:10px; overflow:hidden;">
+        <div style="background:#1a0d2e; padding:12px 16px; font-weight:700; color:#a78bfa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>UserRole</span><span style="font-weight:400; color:#6b7280; font-size:11px;">junction table</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">userId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → User</td><td style="padding:7px 12px; color:#8b949e;">uuid-1234</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">roleId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Role</td><td style="padding:7px 12px; color:#8b949e;">role-001</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">Links one User to one or many Roles. One row = "this user has this role"</div>
+      </div>
+
+      <!-- RolePermission -->
+      <div style="background:#161b22; border:1px solid #7c3aed; border-radius:10px; overflow:hidden;">
+        <div style="background:#1a0d2e; padding:12px 16px; font-weight:700; color:#a78bfa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>RolePermission</span><span style="font-weight:400; color:#6b7280; font-size:11px;">junction table</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">roleId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Role</td><td style="padding:7px 12px; color:#8b949e;">role-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">permissionId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Permission</td><td style="padding:7px 12px; color:#8b949e;">perm-001</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">Links one Role to many Permissions. One row = "this role can do this action"</div>
+      </div>
+
+    </div><!-- end group 1 grid -->
+
+    <!-- ── GROUP 2: PEOPLE ── -->
+    <div style="margin:28px 0 10px; font-size:13px; font-weight:700; color:#60a5fa; letter-spacing:.08em; text-transform:uppercase;">
+      👥 Group 2 — People Tables
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px;">
+
+      <!-- Patient -->
+      <div style="background:#161b22; border:1px solid #2563eb; border-radius:10px; overflow:hidden;">
+        <div style="background:#0d1f3c; padding:12px 16px; font-weight:700; color:#60a5fa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>Patient</span><span style="font-weight:400; color:#6b7280; font-size:11px;">patients</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">pat-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">userId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → User</td><td style="padding:7px 12px; color:#8b949e;">uuid-1234</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">name</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">John Doe</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">dob</td><td style="padding:7px 12px; color:#58a6ff;">Date</td><td style="padding:7px 12px; color:#8b949e;">1995-03-12</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">bloodGroup</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">O+</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">allergies</td><td style="padding:7px 12px; color:#58a6ff;">String?</td><td style="padding:7px 12px; color:#8b949e;">Penicillin</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">conditions</td><td style="padding:7px 12px; color:#58a6ff;">String?</td><td style="padding:7px 12px; color:#8b949e;">Diabetes</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">phone</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">+919876543210</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">address</td><td style="padding:7px 12px; color:#58a6ff;">String?</td><td style="padding:7px 12px; color:#8b949e;">42 MG Road, Chennai</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Doctor -->
+      <div style="background:#161b22; border:1px solid #2563eb; border-radius:10px; overflow:hidden;">
+        <div style="background:#0d1f3c; padding:12px 16px; font-weight:700; color:#60a5fa; font-size:13px; display:flex; justify-content:space-between;">
+          <span>Doctor</span><span style="font-weight:400; color:#6b7280; font-size:11px;">doctors</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">doc-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">userId</td><td style="padding:7px 12px; color:#58a6ff;">String? FK → User</td><td style="padding:7px 12px; color:#8b949e;">uuid-5678 or NULL</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">name</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">Dr. Priya Sharma</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">specialization</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">Cardiologist</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">experience</td><td style="padding:7px 12px; color:#58a6ff;">Int</td><td style="padding:7px 12px; color:#8b949e;">12 (years)</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">isLoginEnabled</td><td style="padding:7px 12px; color:#58a6ff;">Boolean</td><td style="padding:7px 12px; color:#4ade80;">true</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">userId is NULL until Admin clicks "Enable Login" for this doctor</div>
+      </div>
+
+    </div><!-- end group 2 grid -->
+
+    <!-- ── GROUP 3: SCHEDULING ── -->
+    <div style="margin:28px 0 10px; font-size:13px; font-weight:700; color:#fbbf24; letter-spacing:.08em; text-transform:uppercase;">
+      📅 Group 3 — Scheduling Tables
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:24px;">
+
+      <!-- DoctorAvailabilityRule -->
+      <div style="background:#161b22; border:1px solid #d97706; border-radius:10px; overflow:hidden;">
+        <div style="background:#2d1a00; padding:12px 16px; font-weight:700; color:#fbbf24; font-size:13px; display:flex; justify-content:space-between;">
+          <span>DoctorAvailabilityRule</span><span style="font-weight:400; color:#6b7280; font-size:11px;">availability_rules</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">rule-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">doctorId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Doctor</td><td style="padding:7px 12px; color:#8b949e;">doc-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">dayOfWeek</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">MONDAY</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">startTime</td><td style="padding:7px 12px; color:#58a6ff;">Time</td><td style="padding:7px 12px; color:#8b949e;">09:00</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">endTime</td><td style="padding:7px 12px; color:#58a6ff;">Time</td><td style="padding:7px 12px; color:#8b949e;">17:00</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">slotDuration</td><td style="padding:7px 12px; color:#58a6ff;">Int (minutes)</td><td style="padding:7px 12px; color:#8b949e;">30</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">maxPatientsPerSlot</td><td style="padding:7px 12px; color:#58a6ff;">Int</td><td style="padding:7px 12px; color:#8b949e;">2</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">validFrom</td><td style="padding:7px 12px; color:#58a6ff;">Date</td><td style="padding:7px 12px; color:#8b949e;">2026-01-01</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">validTo</td><td style="padding:7px 12px; color:#58a6ff;">Date</td><td style="padding:7px 12px; color:#8b949e;">2026-12-31</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">This rule means: Dr.Priya works every Monday, 09:00–17:00, 30-min slots, max 2 patients per slot → 16 slots × 2 = 32 patients per Monday</div>
+      </div>
+
+      <!-- Appointment -->
+      <div style="background:#161b22; border:1px solid #d97706; border-radius:10px; overflow:hidden;">
+        <div style="background:#2d1a00; padding:12px 16px; font-weight:700; color:#fbbf24; font-size:13px; display:flex; justify-content:space-between;">
+          <span>Appointment</span><span style="font-weight:400; color:#6b7280; font-size:11px;">appointments</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">appt-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">patientId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Patient</td><td style="padding:7px 12px; color:#8b949e;">pat-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">doctorId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Doctor</td><td style="padding:7px 12px; color:#8b949e;">doc-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">appointmentDate</td><td style="padding:7px 12px; color:#58a6ff;">Date</td><td style="padding:7px 12px; color:#8b949e;">2026-05-10</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">startTime</td><td style="padding:7px 12px; color:#58a6ff;">Time</td><td style="padding:7px 12px; color:#8b949e;">10:00</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">endTime</td><td style="padding:7px 12px; color:#58a6ff;">Time</td><td style="padding:7px 12px; color:#8b949e;">10:30</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">status</td><td style="padding:7px 12px; color:#58a6ff;">Enum</td><td style="padding:7px 12px; color:#4ade80;">SCHEDULED</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">paymentStatus</td><td style="padding:7px 12px; color:#58a6ff;">Enum</td><td style="padding:7px 12px; color:#fbbf24;">PENDING</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">reason</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">Chest pain follow-up</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">notes</td><td style="padding:7px 12px; color:#58a6ff;">String?</td><td style="padding:7px 12px; color:#8b949e;">Had pain for 3 days</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">status: CREATED · SCHEDULED · CHECKED_IN · IN_PROGRESS · COMPLETED · CANCELLED · NO_SHOW</div>
+      </div>
+
+      <!-- AppointmentSlotLock -->
+      <div style="background:#161b22; border:1px solid #d97706; border-radius:10px; overflow:hidden;">
+        <div style="background:#2d1a00; padding:12px 16px; font-weight:700; color:#fbbf24; font-size:13px; display:flex; justify-content:space-between;">
+          <span>AppointmentSlotLock</span><span style="font-weight:400; color:#6b7280; font-size:11px;">slot_locks</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">lock-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">doctorId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Doctor</td><td style="padding:7px 12px; color:#8b949e;">doc-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">slotDate</td><td style="padding:7px 12px; color:#58a6ff;">Date</td><td style="padding:7px 12px; color:#8b949e;">2026-05-10</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">slotTime</td><td style="padding:7px 12px; color:#58a6ff;">Time</td><td style="padding:7px 12px; color:#8b949e;">10:00</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">lockedAt</td><td style="padding:7px 12px; color:#58a6ff;">DateTime</td><td style="padding:7px 12px; color:#8b949e;">2026-05-07 14:32:01</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">Permanent DB lock. Created inside the booking transaction. Prevents any future double-booking of the same slot.</div>
+      </div>
+
+    </div><!-- end group 3 grid -->
+
+    <!-- ── GROUP 4: TRACKING ── -->
+    <div style="margin:28px 0 10px; font-size:13px; font-weight:700; color:#4ade80; letter-spacing:.08em; text-transform:uppercase;">
+      📜 Group 4 — Tracking Tables
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:16px; margin-bottom:32px;">
+
+      <!-- AppointmentStatusLog -->
+      <div style="background:#161b22; border:1px solid #16a34a; border-radius:10px; overflow:hidden;">
+        <div style="background:#0d2818; padding:12px 16px; font-weight:700; color:#4ade80; font-size:13px; display:flex; justify-content:space-between;">
+          <span>AppointmentStatusLog</span><span style="font-weight:400; color:#6b7280; font-size:11px;">status_logs</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">log-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">appointmentId</td><td style="padding:7px 12px; color:#58a6ff;">String FK → Appointment</td><td style="padding:7px 12px; color:#8b949e;">appt-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">fromStatus</td><td style="padding:7px 12px; color:#58a6ff;">String?</td><td style="padding:7px 12px; color:#8b949e;">CREATED</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">toStatus</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">SCHEDULED</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">changedBy</td><td style="padding:7px 12px; color:#58a6ff;">String FK → User</td><td style="padding:7px 12px; color:#8b949e;">uuid-recep-01</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">changedAt</td><td style="padding:7px 12px; color:#58a6ff;">DateTime</td><td style="padding:7px 12px; color:#8b949e;">2026-05-07 14:35:00</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">Every status change creates one row here. fromStatus is NULL on first creation.</div>
+      </div>
+
+      <!-- AuditLog -->
+      <div style="background:#161b22; border:1px solid #16a34a; border-radius:10px; overflow:hidden;">
+        <div style="background:#0d2818; padding:12px 16px; font-weight:700; color:#4ade80; font-size:13px; display:flex; justify-content:space-between;">
+          <span>AuditLog</span><span style="font-weight:400; color:#6b7280; font-size:11px;">audit_logs</span>
+        </div>
+        <table style="width:100%; border-collapse:collapse; font-size:12px;">
+          <thead><tr style="background:#0d1117;">
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Field</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Type</th>
+            <th style="padding:7px 12px; text-align:left; color:#6b7280; font-weight:600;">Example</th>
+          </tr></thead>
+          <tbody>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">id</td><td style="padding:7px 12px; color:#58a6ff;">String PK</td><td style="padding:7px 12px; color:#8b949e;">audit-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">entityType</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">APPOINTMENT</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">entityId</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">appt-001</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">action</td><td style="padding:7px 12px; color:#58a6ff;">String</td><td style="padding:7px 12px; color:#8b949e;">APPOINTMENT_CREATED</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">performedBy</td><td style="padding:7px 12px; color:#58a6ff;">String FK → User</td><td style="padding:7px 12px; color:#8b949e;">uuid-1234</td></tr>
+            <tr style="border-top:1px solid #21262d;"><td style="padding:7px 12px; color:#f0f6fc;">timestamp</td><td style="padding:7px 12px; color:#58a6ff;">DateTime</td><td style="padding:7px 12px; color:#8b949e;">2026-05-07 14:32:05</td></tr>
+          </tbody>
+        </table>
+        <div style="padding:8px 12px; background:#0d1117; font-size:11px; color:#6b7280;">entityType values: APPOINTMENT · DOCTOR · PATIENT · USER. action values: CREATED · UPDATED · CANCELLED · STATUS_CHANGED</div>
+      </div>
+
+    </div><!-- end group 4 grid -->
+
+    <!-- RELATIONSHIP DIAGRAM -->
+    <div class="card">
+      <h3>Table Relationships — How All 12 Tables Link Together</h3>
+      <div class="mermaid">
+flowchart TB
+    U["User\nid · phone · password · status"]
+    R["Role\nid · name"]
+    P["Permission\nid · code"]
+    UR["UserRole\nuserId · roleId"]
+    RP["RolePermission\nroleId · permissionId"]
+    PT["Patient\nid · userId · name · dob\nbloodGroup · allergies · address"]
+    DC["Doctor\nid · userId · name\nspecialization · experience"]
+    DAR["DoctorAvailabilityRule\ndoctorId · dayOfWeek\nstartTime · endTime\nslotDuration · maxPerSlot"]
+    AP["Appointment\npatientId · doctorId\ndate · startTime · endTime\nstatus · paymentStatus"]
+    SL["AppointmentSlotLock\ndoctorId · slotDate · slotTime"]
+    ASL["AppointmentStatusLog\nappointmentId · fromStatus\ntoStatus · changedBy"]
+    AL["AuditLog\nentityType · entityId\naction · performedBy"]
+
+    U -->|"has roles via"| UR
+    UR -->|"points to"| R
+    R -->|"has permissions via"| RP
+    RP -->|"points to"| P
+
+    U -->|"1-to-1 optional"| PT
+    U -->|"1-to-1 optional"| DC
+
+    DC -->|"1-to-many"| DAR
+    DC -->|"1-to-many"| AP
+    DC -->|"1-to-many"| SL
+    PT -->|"1-to-many"| AP
+
+    AP -->|"1-to-many"| ASL
+    AP -->|"creates on book"| SL
+    AP -->|"creates"| AL
+    ASL -->|"creates"| AL
+
+    style U   fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style R   fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style P   fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style UR  fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style RP  fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style PT  fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style DC  fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style DAR fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style AP  fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style SL  fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style ASL fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style AL  fill:#0d2818,stroke:#16a34a,color:#4ade80
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ========== AUTH FLOW ========== -->
+  <div class="section" id="auth">
+    <div class="section-header">
+      <div class="section-badge" style="background:#1a0d2e">🔐</div>
+      <div>
+        <h2>3. Authentication Flow</h2>
+        <p>Login, token generation, and request validation for all portals</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Login Flow — POST /api/auth/login</h3>
+      <div class="mermaid">
+flowchart TD
+    START(["User enters phone + password"]) --> REQ["POST /api/auth/login"]
+    REQ --> FIND["Find user by phone in DB"]
+    FIND --> FOUND{User found?}
+    FOUND -- "❌ No" --> E1["401 Invalid credentials"]
+    FOUND -- "✅ Yes" --> BCRYPT["bcryptjs.compare(password, hash)"]
+    BCRYPT --> MATCH{Password matches?}
+    MATCH -- "❌ No" --> E1
+    MATCH -- "✅ Yes" --> STATUS{Check user status}
+    STATUS -- "SUSPENDED" --> E2["403 Account suspended"]
+    STATUS -- "DELETED" --> E3["401 Account not found"]
+    STATUS -- "ACTIVE ✅" --> ROLES["Load roles from UserRole table"]
+    ROLES --> MULTI{Multiple roles?}
+    MULTI -- "Yes" --> PICK["Return role list\nUser selects role"]
+    PICK --> SIGN
+    MULTI -- "No" --> SIGN["jwt.sign(userId + activeRole)\nexpires in 1 hour"]
+    SIGN --> RESP["Return: { token, activeRole, name }"]
+    RESP --> STORE["Client stores in\nlocalStorage.hms_token"]
+    STORE --> USE["Every API request:\nAuthorization: Bearer token"]
+    USE --> VERIFY["getAuthContext(req)\nverify signature + expiry\nvalidate role in DB"]
+    VERIFY --> VALID{Valid?}
+    VALID -- "❌ Expired/Invalid" --> E4["401 Unauthorized"]
+    VALID -- "✅ OK" --> ACCESS["{ userId, activeRole } extracted\nRoute handler proceeds"]
+
+    style START fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style E1 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E2 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E3 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E4 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style SIGN fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style ACCESS fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>Patient Signup — POST /api/auth/signup</h3>
+        <div class="mermaid">
+flowchart TD
+    S(["New Patient"]) --> FORM["Enter phone + password"]
+    FORM --> REQ["POST /api/auth/signup"]
+    REQ --> CHECK{Phone already exists?}
+    CHECK -- "Yes" --> ERR["409 Phone already registered"]
+    CHECK -- "No" --> HASH["bcryptjs.hash(password, 10)"]
+    HASH --> CREATE["CREATE User record\n+ Assign PATIENT role\nautomatically"]
+    CREATE --> JWT["Generate JWT token\n(1 hour expiry)"]
+    JWT --> HOME["Redirect to /home\n(complete profile)"]
+
+    style S fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style ERR fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style CREATE fill:#0d2818,stroke:#16a34a,color:#4ade80
+        </div>
+      </div>
+      <div class="card">
+        <h3>Role-Based Route Access</h3>
+        <div class="mermaid">
+flowchart TD
+    TOKEN["JWT Token decoded\n{ userId, activeRole }"] --> ROLE{activeRole?}
+    ROLE -- "ADMIN" --> AD["/admin/** routes\nAll 13 permissions"]
+    ROLE -- "DOCTOR" --> DC["/doctor/** routes\nLimited permissions"]
+    ROLE -- "PATIENT" --> PT["/home, /DoctorsAppointment\n/my-appointments, etc"]
+    ROLE -- "RECEPTIONIST" --> RC["/receptionist/** routes\nMost permissions"]
+    AD --> P1["✅ USER_CREATE\n✅ ROLE_ASSIGN\n✅ DOCTOR_CREATE\n✅ STATUS_OVERRIDE\n✅ AUDIT_VIEW\n... 13 total"]
+    DC --> P2["✅ STATUS_UPDATE\n❌ USER_CREATE\n❌ ROLE_ASSIGN\n❌ AUDIT_VIEW"]
+    PT --> P3["✅ APPOINTMENT_CREATE\n✅ Own data only\n❌ Admin routes"]
+    RC --> P4["✅ APPOINTMENT_CREATE\n✅ PATIENT_CREATE\n✅ AVAILABILITY_MANAGE\n✅ STATUS_UPDATE"]
+
+    style TOKEN fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style AD fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style DC fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style PT fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style RC fill:#2d1a00,stroke:#d97706,color:#fbbf24
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PATIENT PORTAL ========== -->
+  <div class="section" id="patient">
+    <div class="section-header">
+      <div class="section-badge" style="background:#0d2818">🧑</div>
+      <div>
+        <h2>4. Patient Portal — Complete Flow</h2>
+        <p>From signup to booking appointments and tracking them</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Patient Full Journey</h3>
+      <div class="mermaid">
+flowchart TD
+    ENTRY(["Patient visits app"]) --> ROOT["/page.tsx\nRedirects to /login"]
+    ROOT --> CHOICE{Has account?}
+    CHOICE -- "No" --> SIGNUP["/signup\nPOST /api/auth/signup\nAuto-assign PATIENT role"]
+    CHOICE -- "Yes" --> LOGIN["/login\nPOST /api/auth/login"]
+    SIGNUP --> HOME
+    LOGIN --> HOME
+
+    HOME["/home — Patient Profile\nGET /api/patients\n(own profile only)"] --> PROFILE{Profile complete?}
+    PROFILE -- "Fill details" --> EDIT["PUT /api/patients/id\nName, DOB, blood group\nAllergies, conditions\nAddress, phone"]
+    EDIT --> BROWSE
+    PROFILE -- "Already done" --> BROWSE
+
+    BROWSE["/DoctorsAppointment\nGET /api/doctors\nDoctorsContext caches list\nFilter by specialization"] --> DOC_DETAIL
+
+    DOC_DETAIL["/doctors/id\nGET /api/doctors/id\nShows: bio, qualifications\nexperience, availability\nreviews & ratings"] --> SLOTS
+
+    SLOTS["GET /api/doctors/id/slots?date=YYYY-MM-DD\nCalculates from AvailabilityRule:\n(endTime - startTime) ÷ slotDuration\nminus already-booked slots"] --> SELECT
+
+    SELECT["User selects Date + Time slot\nAppointmentModal opens\nEnter: reason, symptoms, notes"] --> BOOK
+
+    BOOK["POST /api/appointments\n(Full booking validation\nsee Booking section)"] --> BOOKED{Success?}
+    BOOKED -- "❌ Slot taken/locked" --> SLOTS
+    BOOKED -- "✅ 201 Created" --> CONFIRM
+
+    CONFIRM["/booking-info\nConfirmation page\nAppointment ID, doctor\ndate, time, status=CREATED"] --> LIST
+
+    LIST["/my-appointments\nGET /api/appointments\nFiltered: patientId=me\nAppointmentsContext caches"] --> ACTIONS{Actions on appointment}
+
+    ACTIONS -- "Status: CREATED\nor SCHEDULED" --> CANCEL["POST /api/appointments/id/cancel\nStatus → CANCELLED\nBackground job enqueued"]
+    ACTIONS -- "Status: COMPLETED" --> REVIEW["/reviews/id\nLeave doctor review\n⭐ Rating + comment"]
+    ACTIONS -- "View details" --> DETAIL_VIEW["View full appointment\ndetails and status history"]
+
+    style ENTRY fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style SIGNUP fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style LOGIN fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style BOOK fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style CANCEL fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style REVIEW fill:#2d2a00,stroke:#ca8a04,color:#fbbf24
+    style CONFIRM fill:#0d2818,stroke:#16a34a,color:#4ade80
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Patient State Management (React Context)</h3>
+      <div class="mermaid">
+graph LR
+    LAYOUT["(patient)/layout.tsx"] --> DC["DoctorsContext.tsx\nStores: doctors list\nAPI: GET /api/doctors\nShared across pages"]
+    LAYOUT --> AC["AppointmentsContext.tsx\nStores: my appointments\nAPI: GET /api/appointments\nAuto-refreshes"]
+    LAYOUT --> RC["ReviewsContext.tsx\nStores: reviews per doctor\nAPI: GET /api/reviews\nCached"]
+    DC --> DA["/DoctorsAppointment page"]
+    DC --> DD["/doctors/id page"]
+    AC --> MA["/my-appointments page"]
+    AC --> BI["/booking-info page"]
+    RC --> DR["/reviews/id page"]
+    RC --> DD
+
+    style LAYOUT fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style DC fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style AC fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style RC fill:#2d2a00,stroke:#ca8a04,color:#fbbf24
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== DOCTOR PORTAL ========== -->
+  <div class="section" id="doctor">
+    <div class="section-header">
+      <div class="section-badge" style="background:#0d1f3c">🩺</div>
+      <div>
+        <h2>5. Doctor Portal — Complete Flow</h2>
+        <p>How doctors are created, get access, and manage their work</p>
+      </div>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <h3>How Doctor Gets Login Access</h3>
+        <div class="mermaid">
+flowchart TD
+    ADMIN(["Admin"]) --> CREATE["POST /api/doctors\nCreate Doctor profile\n(name, specialization\nexperience, bio)"]
+    CREATE --> RECORD["Doctor record in DB\nuserId = NULL\nisLoginEnabled = false"]
+    RECORD --> ENABLE["Admin clicks Enable Login\nPOST /api/doctors/id/enable-login\n(requires DOCTOR_CREATE permission)"]
+    ENABLE --> TX["Prisma Transaction:\n1. CREATE User(phone, hash(password))\n2. Assign DOCTOR role\n3. Set Doctor.userId = User.id\n4. isLoginEnabled = true"]
+    TX --> READY["Doctor can now login\nat /doctor/login"]
+
+    style ADMIN fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style TX fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style READY fill:#0d2818,stroke:#16a34a,color:#4ade80
+        </div>
+      </div>
+      <div class="card">
+        <h3>Doctor Portal Pages</h3>
+        <div class="mermaid">
+flowchart TD
+    LOGIN(["Doctor logs in\n/doctor/login"]) --> DASH["/doctor — Dashboard\nToday's appointments\nPatient count stats\nSchedule overview"]
+    DASH --> APPTS["/doctor/appointments\nGET /api/appointments\ndoctorId filter applied\nSorted by date+time"]
+    DASH --> PATIENTS["/doctor/patients\nGET /api/patients\nPatients from own appts"]
+    DASH --> SETTINGS["/doctor/settings\nProfile update\nPassword change"]
+
+    APPTS --> UPDATE["Update appointment status\nPATCH /api/appointments/id/status"]
+    UPDATE --> PERM{"Doctor role\nallowed transitions?"}
+    PERM -- "✅ CHECKED_IN → IN_PROGRESS" --> LOG1["Status updated\nStatusLog created\nAuditLog created"]
+    PERM -- "✅ IN_PROGRESS → COMPLETED" --> LOG1
+    PERM -- "❌ Other transitions" --> DENY["403 Forbidden\nInvalid transition"]
+
+    style LOGIN fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style DASH fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style LOG1 fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style DENY fill:#3a0d0d,stroke:#dc2626,color:#f87171
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Doctor Availability Rules → Slot Generation</h3>
+      <div class="mermaid">
+flowchart LR
+    RULE["DoctorAvailabilityRule\ndayOfWeek: MONDAY\nstartTime: 09:00\nendTime: 17:00\nslotDuration: 30 mins\nmaxPerSlot: 2\nvalidFrom: 2026-01-01\nvalidTo: 2026-12-31"] --> CALC["GET /api/doctors/id/slots\n?date=2026-05-07"]
+    CALC --> FILTER["Find rule for\nthat day of week\nwithin valid date range"]
+    FILTER --> SLOTS["Generate all slots:\n09:00, 09:30, 10:00\n10:30 ... 16:30"]
+    SLOTS --> MINUS["Subtract booked slots\ncount appointments\nat each time"]
+    MINUS --> AVAIL["Return available slots\n(where count < maxPerSlot)"]
+    AVAIL --> UI["Shown in Patient Portal\n& Receptionist Portal\nfor booking"]
+
+    style RULE fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style AVAIL fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style UI fill:#2d1a00,stroke:#d97706,color:#fbbf24
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== RECEPTIONIST PORTAL ========== -->
+  <div class="section" id="receptionist">
+    <div class="section-header">
+      <div class="section-badge" style="background:#2d1a00">📋</div>
+      <div>
+        <h2>6. Receptionist Portal — Complete Flow</h2>
+        <p>The frontline management hub — patients, doctors, appointments, reports</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Receptionist Full Workflow</h3>
+      <div class="mermaid">
+flowchart TD
+    LOGIN(["Receptionist logs in\n/receptionist/login"]) --> DASH
+
+    DASH["/receptionist — Dashboard\nDashboardStats: total patients\ndoctors, today's appointments\nDashboardAppointments: today list\nDashboardAvailability: schedule"] --> PATHS{Navigate to}
+
+    PATHS --> PAT_PATH["PATIENT MANAGEMENT"]
+    PATHS --> DOC_PATH["DOCTOR MANAGEMENT"]
+    PATHS --> APPT_PATH["APPOINTMENT MANAGEMENT"]
+    PATHS --> RPT_PATH["REPORTS"]
+    PATHS --> SET_PATH["SETTINGS"]
+
+    PAT_PATH --> ADD_P["/receptionist/add-patient\nPatientModal form\nPOST /api/patients\nrequires PATIENT_CREATE permission"]
+    ADD_P --> P_CREATED["Patient record created in DB\nVisible in Patient Portal\nwhen patient logs in"]
+
+    PAT_PATH --> VIEW_P["/receptionist/patients\nGET /api/patients\nSearchBar to find patient\nPatientsContext caches"]
+    VIEW_P --> P_DETAIL["/receptionist/PatientDetails/id\nGET /api/patients/id\nFull medical history\nAppointment history"]
+    VIEW_P --> EDIT_P["PatientModal edit mode\nPUT /api/patients/id"]
+
+    DOC_PATH --> DOCS["/receptionist/doctors\nGET /api/doctors\nDoctorViewModal: view details\nDoctorEditModal: edit info\nDoctorAddModal: add doctor"]
+    DOCS --> AVAIL["POST /api/doctors/id/availability\nSet working hours\nSlot duration\nMax patients per slot\nRequires AVAILABILITY_MANAGE"]
+    AVAIL --> EDIT_AVAIL["PATCH /api/doctors/id/availability/ruleId\nDELETE /api/doctors/id/availability/ruleId"]
+
+    APPT_PATH --> LIST_A["/receptionist/appointments\nGET /api/appointments\nAll appointments\nAppointmentModal for updates"]
+    LIST_A --> STATUS_UP["PATCH /api/appointments/id/status\nSTATUS_UPDATE permission\nAllowed transitions:\nCREATED → SCHEDULED\nSCHEDULED → CHECKED_IN\nSCHEDULED → NO_SHOW\nCHECKED_IN → IN_PROGRESS\nAny → CANCELLED"]
+
+    APPT_PATH --> BOOK["/receptionist/book-appointment\nSelect: patient + doctor\nSelect: date + time slot\nAdd: reason + notes\nPOST /api/appointments"]
+
+    RPT_PATH --> RPTS["/receptionist/reports\nAggregate stats\nAppointment counts by status\nDoctor utilization\njspdf export to PDF"]
+
+    SET_PATH --> SETS["/receptionist/settings\nProfile update\nPassword: POST /api/auth/change-password"]
+
+    style LOGIN fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style DASH fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style P_CREATED fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style STATUS_UP fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style RPTS fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Receptionist Context Architecture</h3>
+      <div class="mermaid">
+graph TB
+    LAYOUT["(receptionist)/layout.tsx"] --> DC2["DoctorsContext.tsx\nCaches: doctors + availability rules\nAPI: GET /api/doctors\n+ GET /api/doctors/id/availability"]
+    LAYOUT --> AC2["AppointmentsContext.tsx\nCaches: all appointments\nAPI: GET /api/appointments\nIncludes doctor + patient names"]
+    LAYOUT --> PC["PatientsContext.tsx\nCaches: all patients\nAPI: GET /api/patients\nUsed in search + booking"]
+    DC2 --> DD2["Doctors page"]
+    DC2 --> BA["Book Appointment page\n(pick doctor + slots)"]
+    AC2 --> LA["Appointments page"]
+    AC2 --> DASH2["Dashboard widgets"]
+    PC --> VP["Patients page"]
+    PC --> BA
+    PC --> PD["Patient Details page"]
+
+    style LAYOUT fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style DC2 fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style AC2 fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style PC fill:#0d2818,stroke:#16a34a,color:#4ade80
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== ADMIN PORTAL ========== -->
+  <div class="section" id="admin">
+    <div class="section-header">
+      <div class="section-badge" style="background:#1a0d2e">👑</div>
+      <div>
+        <h2>7. Admin Portal — Complete Flow</h2>
+        <p>The control center — user management, roles, audit trail, system oversight</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Admin Full Workflow</h3>
+      <div class="mermaid">
+flowchart TD
+    LOGIN(["Admin logs in\n/admin/login"]) --> DASH["Admin Dashboard\n/admin\nKPI Cards:\n• Total Doctors\n• Total Patients\n• Total Appointments\n• Active Receptionists\nRecent Activity Feed"]
+
+    DASH --> DPATHS{Navigate to}
+
+    DPATHS --> DM["DOCTOR MANAGEMENT\n/admin/doctors"]
+    DPATHS --> RM_["RECEPTIONIST MANAGEMENT\n/admin/receptionists"]
+    DPATHS --> ROLES["ROLE MANAGEMENT\n/admin/roles"]
+    DPATHS --> AUDIT["AUDIT LOGS\n/admin/audit-logs"]
+    DPATHS --> SETT["SETTINGS\n/admin/settings"]
+
+    DM --> D_LIST["GET /api/doctors\nList all doctors with status"]
+    D_LIST --> D_CREATE["POST /api/doctors\nCreate doctor profile\nRequires: DOCTOR_CREATE"]
+    D_LIST --> D_ENABLE["POST /api/doctors/id/enable-login\nCreate User account\nAssign DOCTOR role\nLink User → Doctor"]
+    D_LIST --> D_DISABLE["PATCH /api/doctors/id\n{ isLoginEnabled: false }\nDoctor can no longer login"]
+
+    RM_ --> R_LIST["GET /api/admin/users\nFilter: role=RECEPTIONIST"]
+    R_LIST --> R_SUSPEND["PATCH /api/admin/users/id\n{ status: SUSPENDED }\nUser cannot login\nRequires admin password"]
+    R_LIST --> R_ACTIVATE["PATCH /api/admin/users/id\n{ status: ACTIVE }"]
+
+    ROLES --> ROLE_LIST["View all roles + permissions"]
+    ROLE_LIST --> ASSIGN["POST /api/admin/assign-role\n{ userId, roleId }\nRequires: ROLE_ASSIGN"]
+    ROLE_LIST --> NEW_USER["POST /api/admin/create-user\nCreate receptionist account\nRequires: USER_CREATE"]
+
+    AUDIT --> LOG_VIEW["GET /api/audit-logs\nRequires: AUDIT_VIEW permission\nShows: entity, action\nperformedBy, timestamp\nDoctor/patient names resolved"]
+
+    SETT --> PWD["POST /api/auth/change-password\nRequires current password"]
+
+    style LOGIN fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style DASH fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style D_ENABLE fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style D_DISABLE fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style R_SUSPEND fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style R_ACTIVATE fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style LOG_VIEW fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Permission System — All 13 Permissions by Role</h3>
+      <div class="mermaid">
+graph TB
+    subgraph Perms["All 13 Permissions"]
+        P1["APPOINTMENT_CREATE"]
+        P2["STATUS_UPDATE"]
+        P3["STATUS_OVERRIDE"]
+        P4["AVAILABILITY_MANAGE"]
+        P5["PATIENT_CREATE"]
+        P6["AUDIT_VIEW"]
+        P7["ROLE_ASSIGN"]
+        P8["USER_CREATE"]
+        P9["DOCTOR_CREATE"]
+    end
+
+    subgraph Admin["👑 ADMIN — All permissions"]
+        A1["✅ ALL 13"]
+    end
+    subgraph Recep["📋 RECEPTIONIST"]
+        R1["✅ APPOINTMENT_CREATE"]
+        R2["✅ STATUS_UPDATE"]
+        R3["✅ PATIENT_CREATE"]
+        R4["✅ AVAILABILITY_MANAGE"]
+        R5["❌ AUDIT_VIEW"]
+        R6["❌ ROLE_ASSIGN"]
+        R7["❌ STATUS_OVERRIDE"]
+    end
+    subgraph DocRole["🩺 DOCTOR"]
+        D1["✅ STATUS_UPDATE"]
+        D2["❌ APPOINTMENT_CREATE"]
+        D3["❌ PATIENT_CREATE"]
+        D4["❌ AUDIT_VIEW"]
+    end
+    subgraph PatRole["🧑 PATIENT"]
+        PT1["✅ APPOINTMENT_CREATE\n(own only)"]
+        PT2["❌ STATUS_UPDATE"]
+        PT3["❌ PATIENT_CREATE"]
+        PT4["❌ AUDIT_VIEW"]
+    end
+
+    style Admin fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style Recep fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style DocRole fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style PatRole fill:#0d2818,stroke:#16a34a,color:#4ade80
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BOOKING FLOW ========== -->
+  <div class="section" id="booking">
+    <div class="section-header">
+      <div class="section-badge" style="background:#0d1f3c">📅</div>
+      <div>
+        <h2>8. Appointment Booking — Detailed Flow</h2>
+        <p>Every validation step, the slot locking strategy, and atomic transaction</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Complete Booking Validation Pipeline</h3>
+      <div class="mermaid">
+flowchart TD
+    START(["POST /api/appointments\nBody: doctorId, patientId\nappointmentDate, startTime\nreason, notes"]) --> STEP1
+
+    STEP1["STEP 1: Authentication\ngetAuthContext(req)\nverify JWT + role"] --> AUTH_OK{Valid?}
+    AUTH_OK -- "❌" --> E1["401 Unauthorized"]
+    AUTH_OK -- "✅" --> STEP2
+
+    STEP2["STEP 2: Permission Check\nDoes user have\nAPPOINTMENT_CREATE?"] --> PERM_OK{Has permission?}
+    PERM_OK -- "❌" --> E2["403 Forbidden"]
+    PERM_OK -- "✅" --> STEP3
+
+    STEP3["STEP 3: Zod Validation\nvalidate all input fields\ndoctorId, patientId format\ndate format, time format"] --> ZOD_OK{Valid schema?}
+    ZOD_OK -- "❌" --> E3["400 Bad Request\nValidation errors"]
+    ZOD_OK -- "✅" --> STEP4
+
+    STEP4["STEP 4: Past Slot Check\nappointmentDate + startTime\nmust be in the future"] --> TIME_OK{Future?}
+    TIME_OK -- "❌" --> E4["400 Cannot book past slot"]
+    TIME_OK -- "✅" --> STEP5
+
+    STEP5["STEP 5: Availability Rule Check\nSELECT rule WHERE doctorId\nAND dayOfWeek matches date\nAND validFrom ≤ date ≤ validTo"] --> RULE_OK{Rule found?}
+    RULE_OK -- "❌" --> E5["400 Doctor not available\non this day"]
+    RULE_OK -- "✅" --> STEP6
+
+    STEP6["STEP 6: Slot In Working Hours\nstartTime ≥ rule.startTime\nendTime ≤ rule.endTime\nwhere endTime = start + slotDuration"] --> HOURS_OK{Within hours?}
+    HOURS_OK -- "❌" --> E6["400 Slot outside\nworking hours"]
+    HOURS_OK -- "✅" --> STEP7
+
+    STEP7["STEP 7: Capacity Check\nCOUNT appointments WHERE\ndoctorId + date + time\n< maxPatientsPerSlot"] --> CAP_OK{Has space?}
+    CAP_OK -- "❌" --> E7["409 Slot at capacity"]
+    CAP_OK -- "✅" --> STEP8
+
+    STEP8["STEP 8: Redis Lock\nredis.SET key 1 NX EX 30\nkey = slot:doctorId:date:time\nNX = only if not exists\nEX 30 = auto-expire 30s"] --> REDIS_OK{Lock acquired?}
+    REDIS_OK -- "❌" --> E8["409 Slot temporarily locked\nby another user"]
+    REDIS_OK -- "✅" --> STEP9
+
+    STEP9["STEP 9: DB Lock Check\nSELECT AppointmentSlotLock\nWHERE doctorId + date + time"] --> DB_OK{No existing lock?}
+    DB_OK -- "❌ Lock exists" --> E9["409 Slot already locked"]
+    DB_OK -- "✅ Clear" --> STEP10
+
+    STEP10["STEP 10: Atomic Transaction\nprisma.$transaction(async (tx) => {...})"] --> TX["a. INSERT Appointment\n   status=CREATED\n   paymentStatus=PENDING\n\nb. INSERT AppointmentSlotLock\n   (permanent record)\n\nc. INSERT AppointmentStatusLog\n   null → CREATED\n\nd. INSERT AuditLog\n   APPOINTMENT_CREATED"]
+
+    TX --> TX_OK{Transaction OK?}
+    TX_OK -- "❌ DB Error" --> UNDO["Release Redis lock\n500 Internal Server Error"]
+    TX_OK -- "✅" --> STEP11
+
+    STEP11["STEP 11: Enqueue Background Jobs\nredis.lpush hms:jobs\n• APPOINTMENT_CREATED\n• APPOINTMENT_REMINDER 24h\n• APPOINTMENT_REMINDER 2h\n(non-blocking, fire-and-forget)"] --> DONE
+
+    DONE(["201 Created\n{ appointment }\nRedirect to /booking-info"])
+
+    style START fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style DONE fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style TX fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style E1 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E2 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E3 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E4 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E5 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E6 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E7 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E8 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+    style E9 fill:#3a0d0d,stroke:#dc2626,color:#f87171
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Slot Locking — Race Condition Prevention</h3>
+      <div class="mermaid">
+sequenceDiagram
+    participant A as Patient A (Browser)
+    participant B as Receptionist B (Browser)
+    participant S as Next.js Server
+    participant R as Redis
+    participant DB as PostgreSQL
+
+    Note over A,B: Both try to book Dr.X at 10:00am simultaneously
+
+    A->>S: POST /api/appointments (Dr.X, 10:00)
+    B->>S: POST /api/appointments (Dr.X, 10:00)
+
+    S->>R: SET slot:drX:2026-05-07:10:00 1 NX EX 30
+    Note over R: Atomic — only one wins
+
+    R-->>S: OK (A wins the lock)
+    R-->>S: nil (B loses — key exists)
+
+    S->>DB: Check DB lock (clear for A)
+    DB-->>S: No existing lock
+
+    S->>DB: BEGIN TRANSACTION
+    DB-->>S: Appointment created
+    DB-->>S: SlotLock created
+    DB-->>S: StatusLog created
+    DB-->>S: COMMIT
+
+    S-->>A: 201 Created ✅
+
+    Note over B: B gets rejected
+    S-->>B: 409 Slot temporarily locked ❌
+
+    Note over R: Redis lock auto-expires in 30s
+    Note over DB: DB lock is permanent record
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STATE MACHINE ========== -->
+  <div class="section" id="statemachine">
+    <div class="section-header">
+      <div class="section-badge" style="background:#2d2a00">🔄</div>
+      <div>
+        <h2>9. Appointment Status State Machine</h2>
+        <p>All valid status transitions and which role can perform them</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Status Transition Flow</h3>
+      <div class="mermaid">
+stateDiagram-v2
+    [*] --> CREATED : Booking confirmed\n(Patient or Receptionist)
+
+    CREATED --> SCHEDULED : Receptionist confirms\nappointment
+    CREATED --> CANCELLED : Patient cancels\nor Receptionist cancels
+
+    SCHEDULED --> CHECKED_IN : Patient arrives\n(Receptionist checks in)
+    SCHEDULED --> NO_SHOW : Patient didn't show up\n(Receptionist marks)
+    SCHEDULED --> CANCELLED : Cancelled before check-in
+
+    CHECKED_IN --> IN_PROGRESS : Doctor starts consultation
+    CHECKED_IN --> CANCELLED : Emergency cancellation
+
+    IN_PROGRESS --> COMPLETED : Doctor finishes consultation
+    IN_PROGRESS --> CANCELLED : Rare emergency
+
+    COMPLETED --> [*]
+    CANCELLED --> [*]
+    NO_SHOW --> [*]
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Who Can Do What — Role Transition Matrix</h3>
+      <div class="mermaid">
+graph TB
+    subgraph Patient["🧑 PATIENT — Limited Cancellation"]
+        PT_C["CREATED → CANCELLED"]
+        PT_S["SCHEDULED → CANCELLED"]
+    end
+
+    subgraph Receptionist["📋 RECEPTIONIST — Full Workflow Control"]
+        R_CS["CREATED → SCHEDULED"]
+        R_CI["SCHEDULED → CHECKED_IN"]
+        R_NS["SCHEDULED → NO_SHOW"]
+        R_IP["CHECKED_IN → IN_PROGRESS"]
+        R_CA["Any → CANCELLED"]
+    end
+
+    subgraph Doctor["🩺 DOCTOR — Consultation Phase"]
+        D_IP["CHECKED_IN → IN_PROGRESS"]
+        D_CO["IN_PROGRESS → COMPLETED"]
+    end
+
+    subgraph Admin["👑 ADMIN — Override All (STATUS_OVERRIDE)"]
+        A_ANY["Any Status → Any Status\n(emergency override)"]
+    end
+
+    subgraph OnEveryTransition["📝 Every Transition Creates:"]
+        LOG["AppointmentStatusLog entry\n(fromStatus, toStatus, changedBy)"]
+        AUDIT["AuditLog entry\n(STATUS_UPDATE action)"]
+        JOB["Background job (if CANCELLED)"]
+    end
+
+    Patient --> OnEveryTransition
+    Receptionist --> OnEveryTransition
+    Doctor --> OnEveryTransition
+    Admin --> OnEveryTransition
+
+    style Patient fill:#0d2818,stroke:#16a34a,color:#4ade80
+    style Receptionist fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style Doctor fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style Admin fill:#1a0d2e,stroke:#7c3aed,color:#a78bfa
+    style OnEveryTransition fill:#161b22,stroke:#30363d,color:#8b949e
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== BACKGROUND JOBS ========== -->
+  <div class="section" id="jobs">
+    <div class="section-header">
+      <div class="section-badge" style="background:#0d1117">⚙️</div>
+      <div>
+        <h2>10. Background Job System</h2>
+        <p>Redis-backed queue for notifications, reminders, and cleanup</p>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Job Queue Architecture</h3>
+      <div class="mermaid">
+flowchart LR
+    subgraph Producers["📨 JOB PRODUCERS (API Routes)"]
+        B1["Appointment Created\nAPI Route"]
+        B2["Appointment Cancelled\nAPI Route"]
+        B3["Status Updated\nAPI Route"]
+    end
+
+    subgraph Queue["⚡ UPSTASH REDIS QUEUE\nKey: hms:jobs (List)"]
+        Q["lpush → enqueue at head\nbrpop → dequeue from tail\nFIFO order"]
+    end
+
+    subgraph Worker["🔧 BACKGROUND WORKER\nsrc/jobs/worker.ts\nPolls every 1 second"]
+        W["redis.brpop('hms:jobs', 1)\nParse job JSON\nRoute by job.type"]
+    end
+
+    subgraph Handlers["Job Handlers"]
+        H1["APPOINTMENT_CREATED\n→ Send confirmation\n→ Schedule reminder jobs"]
+        H2["APPOINTMENT_CANCELLED\n→ Send cancellation notice\n→ Free resources"]
+        H3["APPOINTMENT_REMINDER\n→ 24h before: early reminder\n→ 2h before: final reminder"]
+        H4["SLOT_LOCK_CLEANUP\n→ Delete expired locks from DB"]
+    end
+
+    subgraph Retry["🔁 Error Handling"]
+        R["Attempt 1 → Attempt 2 → Attempt 3\nFail → Dead Letter Queue\nSystem continues if Redis down"]
+    end
+
+    B1 & B2 & B3 --> Queue
+    Queue --> Worker
+    Worker --> H1 & H2 & H3 & H4
+    H1 & H2 & H3 & H4 --> Retry
+
+    style Queue fill:#2d1a00,stroke:#d97706,color:#fbbf24
+    style Worker fill:#0d1f3c,stroke:#2563eb,color:#60a5fa
+    style Retry fill:#3a0d0d,stroke:#dc2626,color:#f87171
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== PORTAL CONNECTIONS ========== -->
+  <div class="section" id="connections">
+    <div class="section-header">
+      <div class="section-badge" style="background:#161b22">🔗</div>
+      <div>
+        <h2>11. How All Portals Connect</h2>
+        <p>Data sharing, cross-portal dependencies, and the unified API</p>
+      </div>
+    </div>
+
+    <!-- ── PART A: THE HUB ── -->
+    <div class="card" style="padding:32px;">
+      <h3 style="margin-bottom:6px;">The Core Idea — One Shared Database, 4 Portals</h3>
+      <p style="font-size:13px; color:#8b949e; margin-bottom:28px;">All 4 portals talk to the <strong style="color:#f0f6fc;">same PostgreSQL database</strong> through the same API routes. There is no separate database per portal. When one portal writes data, all other portals instantly see it.</p>
+
+      <!-- Hub visual -->
+      <div style="display:grid; grid-template-columns:1fr auto 1fr; grid-template-rows:auto auto auto; gap:0; align-items:center; justify-items:center; max-width:780px; margin:0 auto;">
+
+        <!-- Row 1: Admin (top center) -->
+        <div></div>
+        <div style="background:#1a0d2e; border:2px solid #7c3aed; border-radius:12px; padding:14px 24px; text-align:center; min-width:180px;">
+          <div style="font-size:22px;">👑</div>
+          <div style="font-weight:700; color:#a78bfa; font-size:13px; margin-top:4px;">Admin Portal</div>
+          <div style="font-size:11px; color:#6b7280; margin-top:4px;">Creates users, doctors<br/>views audit logs</div>
+        </div>
+        <div></div>
+
+        <!-- Row 2: Patient | DB | Receptionist -->
+        <div style="display:flex; flex-direction:column; align-items:flex-end; gap:0;">
+          <div style="background:#0d2818; border:2px solid #16a34a; border-radius:12px; padding:14px 20px; text-align:center; min-width:160px;">
+            <div style="font-size:22px;">🧑</div>
+            <div style="font-weight:700; color:#4ade80; font-size:13px; margin-top:4px;">Patient Portal</div>
+            <div style="font-size:11px; color:#6b7280; margin-top:4px;">Books appointments<br/>views own data</div>
+          </div>
+        </div>
+
+        <!-- Center DB box -->
+        <div style="display:flex; flex-direction:column; align-items:center; padding:16px;">
+          <!-- top connector -->
+          <div style="width:2px; height:24px; background:#374151;"></div>
+          <div style="display:flex; align-items:center; gap:0;">
+            <!-- left connector -->
+            <div style="height:2px; width:28px; background:#374151;"></div>
+            <!-- DB box -->
+            <div style="background:#161b22; border:2px solid #58a6ff; border-radius:16px; padding:20px 28px; text-align:center; box-shadow:0 0 32px rgba(88,166,255,0.15);">
+              <div style="font-size:32px; margin-bottom:8px;">🗄️</div>
+              <div style="font-weight:700; color:#58a6ff; font-size:15px;">PostgreSQL</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:6px; line-height:1.8;">
+                Users &amp; Roles<br/>
+                Doctors &amp; Availability<br/>
+                Patients<br/>
+                Appointments<br/>
+                Audit Logs
+              </div>
+            </div>
+            <!-- right connector -->
+            <div style="height:2px; width:28px; background:#374151;"></div>
+          </div>
+          <!-- bottom connector -->
+          <div style="width:2px; height:24px; background:#374151;"></div>
+        </div>
+
+        <div style="display:flex; flex-direction:column; align-items:flex-start;">
+          <div style="background:#2d1a00; border:2px solid #d97706; border-radius:12px; padding:14px 20px; text-align:center; min-width:160px;">
+            <div style="font-size:22px;">📋</div>
+            <div style="font-weight:700; color:#fbbf24; font-size:13px; margin-top:4px;">Receptionist Portal</div>
+            <div style="font-size:11px; color:#6b7280; margin-top:4px;">Manages patients &amp;<br/>books on their behalf</div>
+          </div>
+        </div>
+
+        <!-- Row 3: Doctor (bottom center) -->
+        <div></div>
+        <div style="background:#0d1f3c; border:2px solid #2563eb; border-radius:12px; padding:14px 24px; text-align:center; min-width:180px;">
+          <div style="font-size:22px;">🩺</div>
+          <div style="font-weight:700; color:#60a5fa; font-size:13px; margin-top:4px;">Doctor Portal</div>
+          <div style="font-size:11px; color:#6b7280; margin-top:4px;">Views schedule<br/>updates appointment status</div>
+        </div>
+        <div></div>
+
+      </div>
+    </div>
+
+    <!-- ── PART B: READS & WRITES TABLE ── -->
+    <div class="card" style="padding:32px;">
+      <h3 style="margin-bottom:6px;">What Each Portal Reads &amp; Writes</h3>
+      <p style="font-size:13px; color:#8b949e; margin-bottom:24px;">Every cell shows whether a portal can <span style="color:#4ade80;">✏️ write</span> or <span style="color:#58a6ff;">📖 read</span> from each database table.</p>
+      <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; font-size:12px; min-width:640px;">
+          <thead>
+            <tr style="background:#0d1117;">
+              <th style="padding:12px 16px; text-align:left; color:#8b949e; font-weight:600; border-bottom:2px solid #21262d; min-width:180px;">Database Table</th>
+              <th style="padding:12px 16px; text-align:center; color:#a78bfa; font-weight:700; border-bottom:2px solid #21262d;">👑 Admin</th>
+              <th style="padding:12px 16px; text-align:center; color:#fbbf24; font-weight:700; border-bottom:2px solid #21262d;">📋 Receptionist</th>
+              <th style="padding:12px 16px; text-align:center; color:#4ade80; font-weight:700; border-bottom:2px solid #21262d;">🧑 Patient</th>
+              <th style="padding:12px 16px; text-align:center; color:#60a5fa; font-weight:700; border-bottom:2px solid #21262d;">🩺 Doctor</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">User</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ create · suspend · activate</span></td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no access —</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ self-register only</span></td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no access —</td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d; background:#0d1117;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">Role &amp; Permission</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ assign roles to users</span></td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no access —</td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no access —</td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no access —</td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">Doctor</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ create · enable/disable login</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 browse list</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 browse · view profile</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 own profile only</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d; background:#0d1117;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">DoctorAvailabilityRule</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ manage all</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ create · edit · delete</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 used to calculate slots</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 view own schedule</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">Patient</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 view all</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ create · edit any patient</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ own profile only</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 patients from own appts</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d; background:#0d1117;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">Appointment</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ override any status</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ create · update status</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ create · cancel own</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ update status (own appts)</span></td>
+            </tr>
+            <tr style="border-bottom:1px solid #21262d;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">AppointmentStatusLog</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 view all via audit</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ auto-written on status change</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 view own history</span></td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#4ade80;">✏️ auto-written on status change</span></td>
+            </tr>
+            <tr style="background:#0d1117;">
+              <td style="padding:11px 16px; color:#f0f6fc; font-weight:600;">AuditLog</td>
+              <td style="padding:11px 16px; text-align:center;"><span style="color:#58a6ff;">📖 view all (AUDIT_VIEW permission)</span></td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no read access —</td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no read access —</td>
+              <td style="padding:11px 16px; text-align:center; color:#6b7280;">— no read access —</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ── PART C: CROSS-PORTAL STORIES ── -->
+    <div class="card" style="padding:32px;">
+      <h3 style="margin-bottom:6px;">5 Cross-Portal Stories — How Data Moves Between Portals</h3>
+      <p style="font-size:13px; color:#8b949e; margin-bottom:28px;">Each story shows one real action and how it ripples across portals through the shared database.</p>
+
+      <div style="display:flex; flex-direction:column; gap:16px;">
+
+        <!-- Story 1 -->
+        <div style="background:#0d1117; border:1px solid #21262d; border-radius:12px; padding:20px 24px;">
+          <div style="font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">Story 1 — Admin enables a Doctor</div>
+          <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap;">
+            <div style="background:#1a0d2e; border:1px solid #7c3aed; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">👑</div>
+              <div style="font-weight:700; color:#a78bfa; font-size:12px;">Admin</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Creates Doctor profile<br/>Clicks "Enable Login"</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 12px;">
+              <div style="height:2px; width:40px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">POST /api/doctors<br/>POST /api/doctors/id/enable-login</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #374151; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">🗄️</div>
+              <div style="font-weight:700; color:#58a6ff; font-size:12px;">Database</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Doctor record created<br/>User + DOCTOR role created<br/>userId linked to Doctor</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 12px;">
+              <div style="height:2px; width:40px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px;">immediately visible</div>
+            </div>
+            <div style="background:#0d1f3c; border:1px solid #2563eb; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">🩺</div>
+              <div style="font-weight:700; color:#60a5fa; font-size:12px;">Doctor</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Can now log in at<br/>/doctor/login</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story 2 -->
+        <div style="background:#0d1117; border:1px solid #21262d; border-radius:12px; padding:20px 24px;">
+          <div style="font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">Story 2 — Receptionist adds a Patient</div>
+          <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap;">
+            <div style="background:#2d1a00; border:1px solid #d97706; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">📋</div>
+              <div style="font-weight:700; color:#fbbf24; font-size:12px;">Receptionist</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Fills patient form<br/>at /add-patient</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 12px;">
+              <div style="height:2px; width:40px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">POST /api/patients</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #374151; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">🗄️</div>
+              <div style="font-weight:700; color:#58a6ff; font-size:12px;">Database</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Patient record saved<br/>linked to User account<br/>(if they have one)</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 12px;">
+              <div style="height:2px; width:40px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px;">same record</div>
+            </div>
+            <div style="background:#0d2818; border:1px solid #16a34a; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">🧑</div>
+              <div style="font-weight:700; color:#4ade80; font-size:12px;">Patient</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Logs in and sees<br/>their profile at /home</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story 3 -->
+        <div style="background:#0d1117; border:1px solid #21262d; border-radius:12px; padding:20px 24px;">
+          <div style="font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">Story 3 — Patient books an appointment (Doctor sees it immediately)</div>
+          <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap;">
+            <div style="background:#0d2818; border:1px solid #16a34a; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">🧑</div>
+              <div style="font-weight:700; color:#4ade80; font-size:12px;">Patient</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Books at<br/>/DoctorsAppointment</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 10px;">
+              <div style="height:2px; width:30px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">POST /api/appointments</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #374151; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">🗄️</div>
+              <div style="font-weight:700; color:#58a6ff; font-size:12px;">Database</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Appointment row<br/>status = CREATED</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 10px;">
+              <div style="height:2px; width:30px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">GET /api/appointments</div>
+            </div>
+            <div style="background:#0d1f3c; border:1px solid #2563eb; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">🩺</div>
+              <div style="font-weight:700; color:#60a5fa; font-size:12px;">Doctor</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Sees it in schedule<br/>at /doctor/appointments</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 10px;">
+              <div style="height:2px; width:30px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">GET /api/appointments</div>
+            </div>
+            <div style="background:#2d1a00; border:1px solid #d97706; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">📋</div>
+              <div style="font-weight:700; color:#fbbf24; font-size:12px;">Receptionist</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Also sees it<br/>in /appointments</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story 4 -->
+        <div style="background:#0d1117; border:1px solid #21262d; border-radius:12px; padding:20px 24px;">
+          <div style="font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">Story 4 — Receptionist sets doctor availability (Patient sees open slots)</div>
+          <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap;">
+            <div style="background:#2d1a00; border:1px solid #d97706; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">📋</div>
+              <div style="font-weight:700; color:#fbbf24; font-size:12px;">Receptionist</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Sets Mon 09:00–17:00<br/>30-min slots</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 12px;">
+              <div style="height:2px; width:40px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">POST /api/doctors/id/availability</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #374151; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">🗄️</div>
+              <div style="font-weight:700; color:#58a6ff; font-size:12px;">Database</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">DoctorAvailabilityRule<br/>row saved</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 12px;">
+              <div style="height:2px; width:40px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">GET /api/doctors/id/slots</div>
+            </div>
+            <div style="background:#0d2818; border:1px solid #16a34a; border-radius:8px; padding:10px 16px; text-align:center; min-width:120px;">
+              <div style="font-size:16px;">🧑</div>
+              <div style="font-weight:700; color:#4ade80; font-size:12px;">Patient</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Sees 16 time slots<br/>available to book</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Story 5 -->
+        <div style="background:#0d1117; border:1px solid #21262d; border-radius:12px; padding:20px 24px;">
+          <div style="font-size:12px; font-weight:700; color:#6b7280; text-transform:uppercase; letter-spacing:.06em; margin-bottom:14px;">Story 5 — Doctor completes appointment (all portals see it, Admin audits it)</div>
+          <div style="display:flex; align-items:center; gap:0; flex-wrap:wrap;">
+            <div style="background:#0d1f3c; border:1px solid #2563eb; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">🩺</div>
+              <div style="font-weight:700; color:#60a5fa; font-size:12px;">Doctor</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Marks appointment<br/>COMPLETED</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 8px;">
+              <div style="height:2px; width:24px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">PATCH /status</div>
+            </div>
+            <div style="background:#161b22; border:1px solid #374151; border-radius:8px; padding:10px 14px; text-align:center; min-width:110px;">
+              <div style="font-size:16px;">🗄️</div>
+              <div style="font-weight:700; color:#58a6ff; font-size:12px;">Database</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">status = COMPLETED<br/>StatusLog written<br/>AuditLog written</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 8px;">
+              <div style="height:2px; width:24px; background:#374151;"></div>
+              <div style="font-size:10px; color:#6b7280; margin-top:4px; white-space:nowrap;">instantly</div>
+            </div>
+            <div style="background:#0d2818; border:1px solid #16a34a; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">🧑</div>
+              <div style="font-weight:700; color:#4ade80; font-size:12px;">Patient</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Sees COMPLETED<br/>in /my-appointments</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 8px;">
+              <div style="height:2px; width:24px; background:#374151;"></div>
+            </div>
+            <div style="background:#2d1a00; border:1px solid #d97706; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">📋</div>
+              <div style="font-weight:700; color:#fbbf24; font-size:12px;">Receptionist</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Sees COMPLETED<br/>in appointments list</div>
+            </div>
+            <div style="display:flex; align-items:center; flex-direction:column; padding:0 8px;">
+              <div style="height:2px; width:24px; background:#374151;"></div>
+            </div>
+            <div style="background:#1a0d2e; border:1px solid #7c3aed; border-radius:8px; padding:10px 14px; text-align:center; min-width:100px;">
+              <div style="font-size:16px;">👑</div>
+              <div style="font-weight:700; color:#a78bfa; font-size:12px;">Admin</div>
+              <div style="font-size:11px; color:#6b7280; margin-top:3px;">Sees full trail<br/>in audit logs</div>
+            </div>
+          </div>
+        </div>
+
+      </div><!-- end stories -->
+    </div>
+
+
+  </div>
+
+</main>
+
+<script>
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: 'dark',
+    themeVariables: {
+      primaryColor: '#1f2937',
+      primaryTextColor: '#e6edf3',
+      primaryBorderColor: '#374151',
+      lineColor: '#6b7280',
+      secondaryColor: '#111827',
+      tertiaryColor: '#1f2937',
+      background: '#0d1117',
+      mainBkg: '#161b22',
+      nodeBorder: '#30363d',
+      clusterBkg: '#0d1117',
+      titleColor: '#f0f6fc',
+      edgeLabelBackground: '#161b22',
+      attributeBackgroundColorEven: '#161b22',
+      attributeBackgroundColorOdd: '#1f2937',
+    },
+    flowchart: { curve: 'basis', padding: 20 },
+    sequence: {
+      diagramMarginX: 20,
+      diagramMarginY: 20,
+      actorMargin: 60,
+      noteMargin: 10,
+    },
+  });
+
+  // Nav active state on scroll
+  const sections = document.querySelectorAll('.section');
+  const navLinks = document.querySelectorAll('nav a');
+
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        navLinks.forEach(a => a.classList.remove('active'));
+        const link = document.querySelector(`nav a[href="#${entry.target.id}"]`);
+        if (link) link.classList.add('active');
+      }
+    });
+  }, { rootMargin: '-20% 0px -70% 0px' });
+
+  sections.forEach(s => observer.observe(s));
+</script>
+</body>
+</html>

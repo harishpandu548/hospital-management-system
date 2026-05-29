@@ -1,26 +1,235 @@
-/* @import "tailwindcss"; */
+/* ============================================
+   HMS DESIGN SYSTEM — Global Tokens & Base
+   ============================================ */
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Brand */
+  --primary:        #6366f1;   /* indigo-500 */
+  --primary-dark:   #4f46e5;   /* indigo-600 */
+  --primary-light:  #e0e7ff;   /* indigo-100 */
+  --primary-glow:   rgba(99,102,241,0.18);
+
+  /* Accent */
+  --accent:         #06b6d4;   /* cyan-500 */
+  --accent-light:   #cffafe;
+
+  /* Surfaces */
+  --bg:             #f8fafc;   /* slate-50 */
+  --surface:        #ffffff;
+  --surface-raised: #f1f5f9;   /* slate-100 */
+  --sidebar-bg:     #0f172a;   /* slate-900 */
+  --sidebar-hover:  #1e293b;   /* slate-800 */
+  --sidebar-active: rgba(99,102,241,0.15);
+  --sidebar-border: rgba(255,255,255,0.06);
+
+  /* Text */
+  --text-primary:   #0f172a;   /* slate-900 */
+  --text-secondary: #475569;   /* slate-600 */
+  --text-muted:     #94a3b8;   /* slate-400 */
+  --text-inverse:   #ffffff;
+
+  /* Borders & Shadows */
+  --border:         #e2e8f0;   /* slate-200 */
+  --border-focus:   #6366f1;
+  --shadow-sm:      0 1px 3px rgba(15,23,42,0.08), 0 1px 2px rgba(15,23,42,0.06);
+  --shadow-md:      0 4px 16px rgba(15,23,42,0.10), 0 2px 6px rgba(15,23,42,0.06);
+  --shadow-lg:      0 16px 48px rgba(15,23,42,0.12), 0 6px 16px rgba(15,23,42,0.08);
+  --shadow-glow:    0 0 0 3px var(--primary-glow);
+
+  /* Status */
+  --success:        #10b981;
+  --success-light:  #d1fae5;
+  --warning:        #f59e0b;
+  --warning-light:  #fef3c7;
+  --danger:         #ef4444;
+  --danger-light:   #fee2e2;
+  --info:           #3b82f6;
+  --info-light:     #dbeafe;
+
+  /* Radius */
+  --radius-sm:      6px;
+  --radius-md:      12px;
+  --radius-lg:      16px;
+  --radius-xl:      24px;
+  --radius-full:    9999px;
+
+  /* Spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+
+  /* Typography */
+  --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+
+  /* Topbar / Navbar */
+  --topbar-height: 64px;
+  --navbar-height: 68px;
+
+  /* Sidebar */
+  --sidebar-width: 240px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+/* ============================================
+   RESET & BASE
+   ============================================ */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--bg);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 15px;
+  line-height: 1.6;
 }
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+}
+
+img, svg {
+  display: block;
+}
+
+/* ============================================
+   UTILITY CLASSES
+   ============================================ */
+
+/* Badges */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: var(--radius-full);
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+.badge-success { background: var(--success-light); color: #065f46; }
+.badge-warning { background: var(--warning-light); color: #92400e; }
+.badge-danger  { background: var(--danger-light);  color: #991b1b; }
+.badge-info    { background: var(--info-light);    color: #1e40af; }
+.badge-primary { background: var(--primary-light); color: #3730a3; }
+
+/* Card */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+/* Premium Button */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+  box-shadow: 0 2px 8px var(--primary-glow);
+}
+.btn-primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px var(--primary-glow);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 22px;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 600;
+  font-size: 14px;
+  border: 1.5px solid var(--primary);
+  border-radius: var(--radius-full);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.btn-secondary:hover {
+  background: var(--primary-light);
+}
+
+/* Form inputs — global premium style */
+.input-field {
+  width: 100%;
+  padding: 11px 16px;
+  background: var(--surface);
+  border: 1.5px solid var(--border);
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.input-field:focus {
+  border-color: var(--border-focus);
+  box-shadow: var(--shadow-glow);
+}
+.input-field::placeholder { color: var(--text-muted); }
+
+/* Table */
+.hms-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.hms-table th {
+  background: var(--surface-raised);
+  color: var(--text-secondary);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 10px 16px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.hms-table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+.hms-table tr:last-child td { border-bottom: none; }
+.hms-table tbody tr:hover { background: var(--bg); }
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }

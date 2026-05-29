@@ -16,14 +16,14 @@ const AvailabilitySchema = z.object({
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId, activeRole } = await getAuthContext(req);
 
     await assertPermission(userId, activeRole, "AVAILABILITY_MANAGE");
 
-    const doctorId = context.params.id;
+    const { id: doctorId } = await context.params;
 
     const doctor = await prisma.doctor.findUnique({
       where: { id: doctorId }
@@ -61,14 +61,14 @@ export async function POST(
 
 export async function GET(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId, activeRole } = await getAuthContext(req);
 
     await assertPermission(userId, activeRole, "AVAILABILITY_MANAGE");
 
-    const doctorId = context.params.id;
+    const { id: doctorId } = await context.params;
 
     const rules = await prisma.doctorAvailabilityRule.findMany({
       where: {

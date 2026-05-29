@@ -1,0 +1,60 @@
+/* Base styles */
+.responsive-dropdown {
+  width: 100%;
+  max-width: 400px;
+  position: relative;
+  margin: 0.5rem auto;
+}
+
+.selector-dropdown {
+  width: 100%;
+  padding: 10px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  box-sizing: border-box;
+}
+
+/* Dropdown suggestions */
+.suggestions-dropdown {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 6px 6px;
+  z-index: 10;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+/* Responsive behavior */
+@media (max-width: 600px) {
+  .responsive-dropdown {
+    max-width: 90%;
+  }
+
+  .selector-dropdown {
+    font-size: 15px;
+    padding: 8px;
+  }
+
+  .suggestion-item {
+    font-size: 15px;
+    padding: 8px;
+  }
+}

@@ -68,27 +68,20 @@ export async function createAppointmentService(input: CreateAppointmentInput) {
 
 //get appointment service for this user and role
 export async function getAppointmentsService(auth: AuthContext) {
-  const { userId, roles } = auth;
+  const { userId, activeRole } = auth;
 
   const where: any = {
     deletedAt: null,
   };
-  //if roles array has patient then add it in const where so we will get that patient id and only that patient appointments are shown
-  if (roles.includes("PATIENT")) {
-    where.patient = {
-      userId,
-    };
-  }
-  //same for the doctor
-  if (roles.includes("DOCTOR")) {
-    where.doctor = {
-      userId,
-    };
+
+  if (activeRole === "PATIENT") {
+    where.patient = { userId };
   }
 
-  //reception and admin has no extra filters they can see all
+  if (activeRole === "DOCTOR") {
+    where.doctor = { userId };
+  }
 
-  //where includes deletedAt patient or doctor info
   return prisma.$transaction(async (tx: any) => {
     return findAppointments(tx, where);
   });
@@ -99,7 +92,7 @@ export async function getAppointmentIdService(
   appointmentId: string,
   auth: AuthContext,
 ) {
-  const { userId, roles } = auth;
+  const { userId, activeRole } = auth;
 
   return prisma.$transaction(async (tx: any) => {
     const appointment = await findAppointmentById(tx, appointmentId);
@@ -107,24 +100,17 @@ export async function getAppointmentIdService(
       throw new Error("Appointment not found");
     }
 
-    const isPatient =
-      roles.includes("PATIENT") && appointment.patient?.userId === userId;
-
-    const isDoctor =
-      roles.includes("DOCTOR") && appointment.doctor?.userId === userId;
-
-    const isStaff = roles.includes("RECEPTIONIST") || roles.includes("ADMIN");
+    const isPatient = activeRole === "PATIENT" && appointment.patient?.userId === userId;
+    const isDoctor = activeRole === "DOCTOR" && appointment.doctor?.userId === userId;
+    const isStaff = activeRole === "RECEPTIONIST" || activeRole === "ADMIN";
 
     if (!isPatient && !isDoctor && !isStaff) {
       throw new Error("Forbidden");
     }
-    if(isStaff){
-      return appointment
+    if (isStaff) {
+      return appointment;
     }
-    const {statusLogs,...filteredData}=appointment
-
-    return{
-      ...filteredData
-    }
+    const { statusLogs, ...filteredData } = appointment;
+    return { ...filteredData };
   });
 }

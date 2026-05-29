@@ -1,0 +1,51 @@
+.three-dot-container {
+  position: relative;
+  display: inline-block;
+}
+
+.three-dot-btn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 5px;
+}
+
+.three-dot-menu {
+  position: absolute;
+  top: 30px;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 10px;
+  min-width: 200px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  z-index: 999;
+}
+
+.three-dot-menu p {
+  margin: 5px 0;
+  font-size: 14px;
+}
+
+.three-dot-menu hr {
+  border: 0.5px solid #ddd;
+  margin: 8px 0;
+}
+
+.three-dot-menu button {
+  background:white;
+  color: black;
+  border: 1px solid black;
+  border-radius: 5px;
+  padding: 6px 10px;
+  margin-top: 5px;
+  cursor: pointer;
+  width: 100%;
+}
+
+.three-dot-menu button:hover {
+  background: black;
+  color:white
+}

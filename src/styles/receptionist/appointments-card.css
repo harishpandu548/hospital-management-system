@@ -1,0 +1,50 @@
+.appointments-container {
+  padding: 1rem;
+  font-family: sans-serif;
+}
+
+.appointments-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem; 
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.outline-btn {
+  padding: 0.6rem 1.4rem;
+  font-weight: bold;
+  border: 2px solid #333;
+  background: transparent;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.solid-btn {
+  padding: 0.6rem 1.4rem;
+  font-weight: bold;
+  background-color: #333;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.filter-buttons {
+  display: flex;
+  gap: 1rem;
+}
+
+.filter-btn {
+  padding: 0.5rem 1rem;
+  background-color: #e8edf3;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}

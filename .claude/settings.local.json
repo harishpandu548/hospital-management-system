@@ -1,0 +1,10 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(Get-ChildItem -Path \"C:\\\\Users\\\\pc\\\\Desktop\\\\HMS-Project\\\\HospitalManagementSystem\\\\hospital-hms\" -Recurse -Directory)",
+      "Bash(Select-Object -ExpandProperty FullName)",
+      "Bash(Start-Process *)",
+      "PowerShell(Start-Process \"C:\\\\Users\\\\pc\\\\Desktop\\\\HMS-Project\\\\HospitalManagementSystem\\\\hospital-hms\\\\public\\\\hms-flow-diagrams.html\")"
+    ]
+  }
+}

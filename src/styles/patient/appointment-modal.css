@@ -1,0 +1,272 @@
+/* ── Modal overlay ───────────────────────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.55);
+  backdrop-filter: blur(6px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 16px;
+  z-index: 9000;
+}
+
+/* ── Modal container ─────────────────────────────────────── */
+.modal {
+  background: #fff;
+  border-radius: 24px;
+  width: 100%;
+  max-width: 560px;
+  max-height: 88vh;          /* FIXED: never taller than viewport */
+  display: flex;
+  flex-direction: column;    /* header / scrollable body / sticky footer */
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.22);
+  overflow: hidden;
+  position: relative;
+}
+
+/* ── Scrollable inner body ───────────────────────────────── */
+.modal-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 24px 8px;
+  -webkit-overflow-scrolling: touch;
+}
+
+.modal-body::-webkit-scrollbar { width: 5px; }
+.modal-body::-webkit-scrollbar-track { background: #f8fafc; }
+.modal-body::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+
+/* ── Modal header (sticky) ───────────────────────────────── */
+.modal-header {
+  padding: 22px 24px 16px;
+  border-bottom: 1px solid #f1f5f9;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 800;
+  color: #0f172a;
+  text-align: center;
+}
+
+/* ── Modal footer (always visible) ──────────────────────── */
+.modal-footer {
+  padding: 14px 24px 20px;
+  border-top: 1px solid #f1f5f9;
+  flex-shrink: 0;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+/* ── Close button ────────────────────────────────────────── */
+.close-icon {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  width: 32px;
+  height: 32px;
+  border-radius: 10px;
+  background: #f1f5f9;
+  border: none;
+  cursor: pointer;
+  font-size: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #475569;
+  line-height: 1;
+  transition: all 0.15s;
+}
+.close-icon:hover { background: #e2e8f0; color: #0f172a; }
+
+/* ── Doctor info block ───────────────────────────────────── */
+.doctor-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 16px 0 10px;
+  gap: 6px;
+}
+
+.modal-doctor-avatar {
+  width: 66px;
+  height: 66px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #e0e7ff, #c7d2fe);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  color: #4f46e5;
+}
+
+.nameSpecialty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.doctor-info h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.specialty {
+  color: #4f46e5;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 3px 12px;
+  border-radius: 20px;
+  border: 1px solid #c7d2fe;
+  background-color: #eef2ff;
+}
+
+h5.desc {
+  font-style: italic;
+  font-weight: 400;
+  font-size: 13px;
+  color: #64748b;
+  text-align: center;
+  margin: 4px 0 0;
+}
+
+/* ── Date picker ─────────────────────────────────────────── */
+.date-label {
+  display: block;
+  margin: 14px 0 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #374151;
+  text-align: left;
+}
+
+.date-picker {
+  margin-bottom: 4px;
+}
+
+.date-picker input[type="date"] {
+  width: 100%;
+  padding: 10px 14px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  font-size: 14px;
+  cursor: pointer;
+  background: #fff;
+  outline: none;
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.18s;
+}
+.date-picker input[type="date"]:focus { border-color: #6366f1; }
+
+/* ── Time slots ──────────────────────────────────────────── */
+.time-slots {
+  margin-top: 10px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.time-slot {
+  padding: 9px 14px;
+  border-radius: 12px;
+  border: 1.5px solid #e2e8f0;
+  background: #f8fafc;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+  transition: all 0.18s;
+  outline: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 80px;
+}
+
+.time-slot:hover:not(:disabled) {
+  border-color: #a5b4fc;
+  background: #eef2ff;
+  color: #4f46e5;
+}
+
+.time-slot.selected {
+  background: linear-gradient(135deg, #eef2ff, #e0e7ff);
+  border: 2px solid #6366f1;
+  color: #4f46e5;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(99, 102, 241, 0.2);
+}
+
+/* ── Booking for bar ─────────────────────────────────────── */
+.booking-for-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 6px 0 14px;
+}
+
+.booking-for-chip {
+  padding: 7px 14px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: 2px solid;
+  transition: all 0.18s;
+}
+
+/* ── Action buttons ──────────────────────────────────────── */
+.cancel-btn {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1.5px solid #e2e8f0;
+  border-radius: 12px;
+  background: #fff;
+  color: #475569;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+}
+.cancel-btn:hover { background: #f1f5f9; }
+
+.confirm-btn {
+  flex: 2;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #6366f1, #4f46e5);
+  color: #fff;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.18s;
+  font-family: inherit;
+  box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+}
+.confirm-btn:hover:not(:disabled) { opacity: 0.9; transform: translateY(-1px); }
+.confirm-btn:disabled { opacity: 0.55; cursor: not-allowed; box-shadow: none; }
+
+/* ── Mobile ──────────────────────────────────────────────── */
+@media (max-width: 560px) {
+  .modal {
+    max-height: 95vh;
+    border-radius: 20px;
+  }
+  .modal-header { padding: 16px 18px 12px; }
+  .modal-body { padding: 0 18px 8px; }
+  .modal-footer { padding: 12px 18px 16px; }
+  .modal-header h2 { font-size: 17px; }
+}

@@ -5,9 +5,25 @@ import { AppointmentStatus } from "@prisma/client";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
-//zod schema
+// Per-role allowed transitions enforced server-side
+const ROLE_TRANSITIONS: Record<string, Record<string, string[]>> = {
+  PATIENT: {
+    SCHEDULED: ["CANCELLED"],
+    CREATED: ["CANCELLED"],
+  },
+  RECEPTIONIST: {
+    CREATED: ["SCHEDULED", "CANCELLED"],
+    SCHEDULED: ["CHECKED_IN", "CANCELLED", "NO_SHOW"],
+    CHECKED_IN: ["IN_PROGRESS", "CANCELLED"],
+  },
+  DOCTOR: {
+    CHECKED_IN: ["IN_PROGRESS"],
+    IN_PROGRESS: ["COMPLETED"],
+  },
+};
+
 const UpdateStatusSchema = z.object({
-  newStatus: z.nativeEnum(AppointmentStatus), //newStatus must be one of the valid appointment statuses
+  newStatus: z.nativeEnum(AppointmentStatus),
   reason: z.string().optional(),
   allowOverride: z.boolean().optional(),
 });
@@ -18,21 +34,34 @@ export async function PATCH(
 ) {
   try {
     const { id } = await context.params;
-    //auth
     const { userId, activeRole } = await getAuthContext(req);
 
-    //validate body
     const body = await req.json();
     const data = UpdateStatusSchema.parse(body);
 
-    let roleUsed: string;
     if (data.allowOverride === true) {
       await assertPermission(userId, activeRole, "STATUS_OVERRIDE");
     } else {
       await assertPermission(userId, activeRole, "STATUS_UPDATE");
     }
 
-    //call service to update the status
+    // For non-admin roles, enforce role-specific transition rules
+    if (activeRole !== "ADMIN" && !data.allowOverride) {
+      const { prisma } = await import("@/lib/prisma");
+      const appointment = await prisma.appointment.findUnique({ where: { id } });
+      if (!appointment) {
+        return NextResponse.json({ error: "Appointment not found" }, { status: 404 });
+      }
+
+      const allowedFromCurrent = ROLE_TRANSITIONS[activeRole]?.[appointment.status] ?? [];
+      if (!allowedFromCurrent.includes(data.newStatus)) {
+        const msg = allowedFromCurrent.length === 0
+          ? `Your role cannot update appointments in ${appointment.status} status.`
+          : `${activeRole} can only transition ${appointment.status} to: ${allowedFromCurrent.join(", ")}. Cannot set ${data.newStatus}.`;
+        return NextResponse.json({ error: msg }, { status: 403 });
+      }
+    }
+
     const updated = await updateAppointmentStatusService({
       appointmentId: id,
       newStatus: data.newStatus,
@@ -41,13 +70,9 @@ export async function PATCH(
       reason: data.reason,
       allowOverride: data.allowOverride,
     });
+
     return NextResponse.json(updated);
   } catch (error: any) {
-    return NextResponse.json(
-      {
-        error: error.message,
-      },
-      { status: 400 },
-    );
+    return NextResponse.json({ error: error.message }, { status: 400 });
   }
 }

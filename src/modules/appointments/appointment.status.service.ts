@@ -52,7 +52,7 @@ export async function updateAppointmentStatusService(input:UpdateAppointmentStat
         })
 
         //status log
-        await tx.AppointmentStatusLog.create({
+        await tx.appointmentStatusLog.create({
             data:{
                 appointmentId:appointment.id,
                 oldStatus:currentStatus,
@@ -74,21 +74,24 @@ export async function updateAppointmentStatusService(input:UpdateAppointmentStat
         })
         return updated
     })
-    //only when scheduled or else cancelled reminder is sent
-    if(input.newStatus==="SCHEDULED"){
-        await enqueueJob("APPOINTMENT_REMINDER",{
-            appointmentId:updated.id,
-            reminderType:"T_24H"
-        })
-        await enqueueJob("APPOINTMENT_REMINDER",{
-            appointmentId:updated.id,
-            reminderType:"T_2H"
-        })
-    }
-    if(input.newStatus==="CANCELLED"){
-        await enqueueJob("APPOINTMENT_CANCELLED",{
-            appointmentId:appointment.id
-        })
+    try {
+        if(input.newStatus==="SCHEDULED"){
+            await enqueueJob("APPOINTMENT_REMINDER",{
+                appointmentId:updated.id,
+                reminderType:"T_24H"
+            })
+            await enqueueJob("APPOINTMENT_REMINDER",{
+                appointmentId:updated.id,
+                reminderType:"T_2H"
+            })
+        }
+        if(input.newStatus==="CANCELLED"){
+            await enqueueJob("APPOINTMENT_CANCELLED",{
+                appointmentId:appointment.id
+            })
+        }
+    } catch {
+        // Redis unavailable — status was updated successfully, jobs skipped
     }
     return updated
 }

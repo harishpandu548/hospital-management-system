@@ -1,0 +1,27 @@
+.availability-container {
+  padding: 1rem;
+  font-family: sans-serif;
+}
+
+.appointments-container h1 {
+  font-size: 2rem;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.outline-btn {
+  padding: 0.6rem 1.4rem;
+  font-weight: bold;
+  border: 2px solid #333;
+  background: transparent;
+  color: #333;
+  border-radius: 6px;
+  cursor: pointer;
+}
+

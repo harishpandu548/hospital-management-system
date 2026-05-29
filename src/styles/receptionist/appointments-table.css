@@ -1,0 +1,36 @@
+/* ─── Appointments Table (Dashboard) ───────────────────────────── */
+.appointment-table-container {
+  overflow-x: auto;
+}
+
+.appointment-table-container table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+
+.appointment-table-container thead tr {
+  background: #f8fafc;
+}
+
+.appointment-table-container thead th {
+  padding: 10px 14px;
+  text-align: left;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #64748b;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.appointment-table-container tbody td {
+  padding: 11px 14px;
+  border-top: 1px solid #f8fafc;
+  color: #1e293b;
+  vertical-align: middle;
+}
+
+.appointment-table-container tbody tr {
+  transition: background 0.15s;
+}

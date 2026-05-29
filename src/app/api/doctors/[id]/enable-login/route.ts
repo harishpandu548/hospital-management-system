@@ -6,7 +6,7 @@ import bcrypt from "bcryptjs";
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId, activeRole } = await getAuthContext(req);
@@ -14,7 +14,7 @@ export async function POST(
     //permission check
     await assertPermission(userId, activeRole, "DOCTOR_CREATE");
 
-    const doctorId = context.params.id;
+    const { id: doctorId } = await context.params;
 
     const body = await req.json();
     const { phone, password } = body;

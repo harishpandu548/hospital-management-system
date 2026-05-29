@@ -5,14 +5,14 @@ import { assertPermission } from "@/modules/appointments/appointment.permissions
 
 export async function DELETE(
   req: NextRequest,
-  context: { params: { id: string; ruleId: string } }
+  context: { params: Promise<{ id: string; ruleId: string }> }
 ) {
   try {
     const { userId, activeRole } = await getAuthContext(req);
 
     await assertPermission(userId, activeRole, "AVAILABILITY_MANAGE");
 
-    const { id: doctorId, ruleId } = context.params;
+    const { id: doctorId, ruleId } = await context.params;
 
     const rule = await prisma.doctorAvailabilityRule.findUnique({
       where: { id: ruleId }

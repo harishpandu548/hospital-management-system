@@ -5,14 +5,19 @@ import { AppointmentStatus } from "@prisma/client";
 
 export async function POST(
   req: NextRequest,
-  context: { params: { id: string } }
+  context: { params: Promise<{ id: string }> }
 ) {
   try {
     const { userId, activeRole } = await getAuthContext(req);
-    const appointmentId = context.params.id;
+    const { id: appointmentId } = await context.params;
 
-    const body = await req.json();
-    const { reason } = body;
+    let reason: string | undefined;
+    try {
+      const body = await req.json();
+      reason = body?.reason;
+    } catch {
+      // No body or invalid JSON — reason is optional
+    }
 
     const appointment = await prisma.appointment.findUnique({
       where: { id: appointmentId },
