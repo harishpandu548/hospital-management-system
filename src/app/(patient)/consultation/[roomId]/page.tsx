@@ -4,15 +4,16 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   FiMic, FiMicOff, FiVideo, FiVideoOff,
   FiPhoneOff, FiSend, FiPaperclip,
-  FiMessageSquare, FiFile, FiImage, FiFileText,
+  FiMessageSquare, FiFile, FiImage, FiFileText, FiX
 } from 'react-icons/fi';
+import { io, Socket } from 'socket.io-client';
 import '@/styles/patient/call-room.css';
 
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
 ];
-const POLL_MS = 1500;
+// WebSockets replace polling
 
 function fileIcon(type = '') {
   if (type.startsWith('image/')) return <FiImage size={18} />;
@@ -34,20 +35,21 @@ export default function PatientCallRoom() {
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [err, setErr]           = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const localVid  = useRef<HTMLVideoElement>(null);
   const remoteVid = useRef<HTMLVideoElement>(null);
   const pcRef     = useRef<RTCPeerConnection | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  const lastSigId = useRef('');
-  const lastMsgId = useRef('');
-  const sigTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
-  const msgTimer  = useRef<ReturnType<typeof setInterval> | null>(null);
+  const socketRef = useRef<Socket | null>(null);
   const roomTimer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
   const chatEnd   = useRef<HTMLDivElement>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') ?? '' : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') ?? '' : '';
   const H = { Authorization: `Bearer ${token}` };
 
   // ── auto-scroll chat (fixed: runs only when messages change) ──────
@@ -66,28 +68,20 @@ export default function PatientCallRoom() {
     return data;
   }, [roomId]);
 
-  // ── poll messages ──────────────────────────────────────────────────
-  const pollMsgs = useCallback(async () => {
-    const res = await fetch(`/api/consultations/${roomId}/messages?afterId=${lastMsgId.current}`, { headers: H });
+  // ── fetch messages initially ──────────────────────────────────────────────────
+  const fetchInitialMsgs = useCallback(async () => {
+    const res = await fetch(`/api/consultations/${roomId}/messages`, { headers: H });
     if (!res.ok) return;
     const list: any[] = await res.json();
-    if (!list.length) return;
-    lastMsgId.current = list[list.length - 1].id;
-    setMessages((prev) => {
-      const seen = new Set(prev.map((m) => m.id));
-      return [...prev, ...list.filter((m) => !seen.has(m.id))];
-    });
+    setMessages(list);
   }, [roomId]);
 
   // ── WebRTC (patient = offerer) ─────────────────────────────────────
   const buildPC = useCallback(() => {
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-    pc.onicecandidate = async (e) => {
+    pc.onicecandidate = (e) => {
       if (!e.candidate) return;
-      await fetch(`/api/consultations/${roomId}/signal`, {
-        method: 'POST', headers: { ...H, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'ice-candidate', payload: e.candidate }),
-      });
+      socketRef.current?.emit('signal', { roomId, type: 'ice-candidate', payload: e.candidate, senderRole: 'PATIENT' });
     };
     pc.ontrack = (e) => {
       if (remoteVid.current) { remoteVid.current.srcObject = e.streams[0]; setCallStatus('connected'); }
@@ -109,56 +103,77 @@ export default function PatientCallRoom() {
       stream.getTracks().forEach((t) => pc.addTrack(t, stream));
       const offer = await pc.createOffer();
       await pc.setLocalDescription(offer);
-      await fetch(`/api/consultations/${roomId}/signal`, {
-        method: 'POST', headers: { ...H, 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'offer', payload: offer }),
-      });
+      
+      socketRef.current?.emit('signal', { roomId, type: 'offer', payload: offer, senderRole: 'PATIENT' });
     } catch {
       setErr('Camera/microphone access denied. Please allow permissions and refresh.');
       setCallStatus('idle');
     }
   }, [roomId, buildPC]);
 
-  const pollSignals = useCallback(async () => {
-    const res = await fetch(`/api/consultations/${roomId}/signal?lastId=${lastSigId.current}&myRole=PATIENT`, { headers: H });
-    if (!res.ok) return;
-    const sigs: any[] = await res.json();
-    if (!sigs.length) return;
-    lastSigId.current = sigs[sigs.length - 1].id;
-    for (const s of sigs) {
-      const payload = JSON.parse(s.payload);
+  const initSocket = useCallback(() => {
+    const socket = io('http://localhost:3001');
+    socketRef.current = socket;
+    
+    socket.emit('join-room', roomId);
+    
+    socket.on('signal', async (data) => {
+      if (data.senderRole === 'PATIENT') return; // Ignore own signals
       const pc = pcRef.current;
-      if (!pc) continue;
-      if (s.type === 'answer' && pc.signalingState === 'have-local-offer') {
-        await pc.setRemoteDescription(new RTCSessionDescription(payload));
-      } else if (s.type === 'ice-candidate') {
-        try { await pc.addIceCandidate(new RTCIceCandidate(payload)); } catch { /**/ }
+      if (!pc) return;
+      
+      if (data.type === 'answer' && pc.signalingState === 'have-local-offer') {
+        await pc.setRemoteDescription(new RTCSessionDescription(data.payload));
+      } else if (data.type === 'ice-candidate') {
+        try { await pc.addIceCandidate(new RTCIceCandidate(data.payload)); } catch { /**/ }
       }
-    }
+    });
+
+    socket.on('chat-message', (msg) => {
+      setMessages((prev) => {
+        if (prev.find(m => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
+      setShowChat((prevShowChat) => {
+        if (!prevShowChat) setUnreadCount((c) => c + 1);
+        return prevShowChat;
+      });
+    });
+
+    socket.on('user-joined', () => {
+      // Doctor joined!
+      fetchRoom(); 
+    });
+
+    socket.on('typing', (data) => {
+      if (data.role !== 'PATIENT') {
+        setIsOtherTyping(true);
+        if (typingTimeout.current) clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => setIsOtherTyping(false), 2000);
+      }
+    });
   }, [roomId]);
 
   const stopPolling = useCallback(() => {
-    if (sigTimer.current)  { clearInterval(sigTimer.current);  sigTimer.current  = null; }
-    if (msgTimer.current)  { clearInterval(msgTimer.current);  msgTimer.current  = null; }
     if (roomTimer.current) { clearInterval(roomTimer.current); roomTimer.current = null; }
   }, []);
 
   // ── init ───────────────────────────────────────────────────────────
   useEffect(() => {
     if (!token) { router.replace('/login'); return; }
+    
+    initSocket();
+
     fetchRoom().then((data) => {
       if (!data) return;
-      pollMsgs(); // initial load
-      // Only start signal polling if room is active/pending
-      if (data.status === 'PENDING' || data.status === 'ACTIVE') {
-        sigTimer.current = setInterval(pollSignals, POLL_MS);
-        msgTimer.current = setInterval(pollMsgs, POLL_MS);
-      }
+      fetchInitialMsgs();
     });
+    
     return () => {
       stopPolling();
       streamRef.current?.getTracks().forEach((t) => t.stop());
       pcRef.current?.close();
+      socketRef.current?.disconnect();
     };
   }, [roomId]);
 
@@ -176,18 +191,12 @@ export default function PatientCallRoom() {
     }
 
     if (room.status === 'PENDING') {
-      // Poll room status every 4s to detect when doctor accepts
+      // Poll room status every 4s to detect when doctor accepts (fallback in case socket event is missed)
       if (!roomTimer.current) {
         roomTimer.current = setInterval(fetchRoom, 4000);
       }
-      // Start signal+msg polling if not already running
-      if (!sigTimer.current) sigTimer.current = setInterval(pollSignals, POLL_MS);
-      if (!msgTimer.current) msgTimer.current = setInterval(pollMsgs, POLL_MS);
     } else if (room.status === 'ACTIVE') {
-      // Stop the room-status poll once active
       if (roomTimer.current) { clearInterval(roomTimer.current); roomTimer.current = null; }
-      if (!sigTimer.current) sigTimer.current = setInterval(pollSignals, POLL_MS);
-      if (!msgTimer.current) msgTimer.current = setInterval(pollMsgs, POLL_MS);
     }
   }, [room?.status]);
 
@@ -223,7 +232,7 @@ export default function PatientCallRoom() {
       if (res.ok) {
         const m = await res.json();
         setMessages((prev) => prev.find((x) => x.id === m.id) ? prev : [...prev, m]);
-        lastMsgId.current = m.id;
+        socketRef.current?.emit('chat-message', { roomId, message: m });
       }
     } catch { /**/ } finally { setSending(false); }
   };
@@ -244,7 +253,7 @@ export default function PatientCallRoom() {
       if (res.ok) {
         const m = await res.json();
         setMessages((prev) => prev.find((x) => x.id === m.id) ? prev : [...prev, m]);
-        lastMsgId.current = m.id;
+        socketRef.current?.emit('chat-message', { roomId, message: m });
       }
     } catch { setErr('Upload failed. Try again.'); } finally { setUploading(false); }
   };
@@ -270,8 +279,13 @@ export default function PatientCallRoom() {
   const statusClass = STATUS_CLASSES[room.status as string] ?? 'pill-ended';
   const myRole = 'PATIENT';
 
+  const handleToggleChat = () => {
+    setShowChat(prev => !prev);
+    if (!showChat) setUnreadCount(0);
+  };
+
   return (
-    <div className="call-room-shell">
+    <div className={`call-room-shell ${showChat ? 'chat-open' : ''}`}>
       {/* ── TOP BAR ─────────────────────────────────────────── */}
       <div className="call-topbar">
         <div className="call-topbar-info">
@@ -365,14 +379,19 @@ export default function PatientCallRoom() {
 
         {/* CHAT */}
         <div
-          className="call-chat-side"
+          className={`call-chat-side ${showChat ? 'open' : ''}`}
           onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
           onDragLeave={() => setDragging(false)}
           onDrop={onDrop}
         >
           <div className="chat-head">
-            <FiMessageSquare size={15} />
-            Chat with Dr. {room.doctor?.fullname}
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FiMessageSquare size={15} />
+              Chat with Dr. {room.doctor?.fullname}
+            </div>
+            <button className="chat-close-btn" onClick={() => setShowChat(false)} title="Close Chat">
+              <FiX size={16} />
+            </button>
           </div>
 
           <div className="chat-msgs">
@@ -405,6 +424,13 @@ export default function PatientCallRoom() {
             <div ref={chatEnd} style={{ height: 1 }} />
           </div>
 
+          {isOtherTyping && (
+            <div style={{ padding: '0 14px 10px', fontSize: 11, color: '#94a3b8', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6 }}>
+              Dr. {room.doctor?.fullname} is typing<span className="typing-dots" />
+              <style>{`@keyframes typingDots { 0% { content: "."; } 33% { content: ".."; } 66% { content: "..."; } } .typing-dots::after { content: "."; animation: typingDots 1.5s infinite; }`}</style>
+            </div>
+          )}
+
           {!isEnded && (
             <div className="chat-input-area">
               {/* Drag & drop zone */}
@@ -428,7 +454,10 @@ export default function PatientCallRoom() {
                   rows={2}
                   placeholder="Type a message…"
                   value={text}
-                  onChange={(e) => setText(e.target.value)}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    socketRef.current?.emit('typing', { roomId, role: 'PATIENT' });
+                  }}
                   onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
                 />
                 <button className="chat-btn attach" onClick={() => fileInput.current?.click()} title="Attach file" disabled={uploading}>
@@ -442,6 +471,14 @@ export default function PatientCallRoom() {
             </div>
           )}
         </div>
+        
+        {/* Floating Chat Toggle Button */}
+        {!isEnded && room.status === 'ACTIVE' && (
+          <button className="chat-toggle-btn" onClick={handleToggleChat} title="Toggle Chat">
+            <FiMessageSquare />
+            {unreadCount > 0 && <div className="chat-badge">{unreadCount}</div>}
+          </button>
+        )}
       </div>
     </div>
   );

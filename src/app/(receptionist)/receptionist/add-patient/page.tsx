@@ -5,7 +5,7 @@ import { usePatients } from '@/context/receptionist/PatientsContext';
 import '@/styles/receptionist/doctor-add-modal.css';
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const AddPatientPage = () => {
   const router = useRouter();

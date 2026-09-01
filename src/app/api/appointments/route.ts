@@ -55,9 +55,19 @@ export async function GET(req: NextRequest) {
 }
 
 export async function POST(req: NextRequest) {
+  // Separate auth check so we can return 401 specifically for auth failures
+  let authCtx: { userId: string; activeRole: string };
   try {
-    const { userId, activeRole } = await getAuthContext(req);
+    authCtx = await getAuthContext(req);
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  try {
+    const { userId, activeRole } = authCtx;
     const body = await req.json();
+
+    console.log("[POST /api/appointments] body received:", JSON.stringify(body));
 
     let patientId = body.patientId;
 
@@ -68,6 +78,7 @@ export async function POST(req: NextRequest) {
           where: { id: patientId, userId, deletedAt: null },
         });
         if (!ownedPatient) {
+          console.log("[POST /api/appointments] 403: patientId not owned by user");
           return NextResponse.json({ error: "Invalid patient profile selected." }, { status: 403 });
         }
       } else {
@@ -79,6 +90,7 @@ export async function POST(req: NextRequest) {
           // Fall back to any patient profile linked to this user
           const anyPatient = await prisma.patient.findFirst({ where: { userId, deletedAt: null } });
           if (!anyPatient) {
+            console.log("[POST /api/appointments] 404: no patient profile found");
             return NextResponse.json({ error: "Patient profile not found. Please complete your profile first." }, { status: 404 });
           }
           patientId = anyPatient.id;
@@ -87,6 +99,8 @@ export async function POST(req: NextRequest) {
         }
       }
     }
+
+    console.log("[POST /api/appointments] resolved patientId:", patientId, "| doctorId:", body.doctorId);
 
     if (!patientId) return NextResponse.json({ error: "patientId is required" }, { status: 400 });
     if (!body.doctorId) return NextResponse.json({ error: "doctorId is required" }, { status: 400 });
@@ -98,15 +112,26 @@ export async function POST(req: NextRequest) {
       ? new Date(body.slotEnd)
       : new Date(slotStart.getTime() + 30 * 60000);
 
-    // 1. Reject past slots
-    if (slotStart <= new Date()) {
+    // Validate parsed dates
+    if (isNaN(appointmentDate.getTime()) || isNaN(slotStart.getTime()) || isNaN(slotEnd.getTime())) {
+      return NextResponse.json({ error: "Invalid date format provided." }, { status: 400 });
+    }
+
+    // 1. Reject past slots (use slotStart for comparison, with a small 10s grace period)
+    const now = new Date();
+    console.log("[POST /api/appointments] slotStart:", slotStart.toISOString(), "| now:", now.toISOString());
+    if (slotStart.getTime() <= now.getTime() - 10_000) {
+      console.log("[POST /api/appointments] 400: slot is in the past");
       return NextResponse.json({ error: "Cannot book an appointment in the past." }, { status: 400 });
     }
 
     // 2. Doctor must have an availability rule for this day
-    const dayOfWeek = appointmentDate.getUTCDay();
+    // appointmentDate is a full ISO timestamp — derive UTC day from it
     const dayStart = new Date(appointmentDate);
     dayStart.setUTCHours(0, 0, 0, 0);
+    const dayOfWeek = dayStart.getUTCDay();
+
+    console.log("[POST /api/appointments] dayStart:", dayStart.toISOString(), "| dayOfWeek:", dayOfWeek, "| doctorId:", body.doctorId);
 
     const rule = await prisma.doctorAvailabilityRule.findFirst({
       where: {
@@ -117,6 +142,8 @@ export async function POST(req: NextRequest) {
         OR: [{ validTo: null }, { validTo: { gte: dayStart } }],
       },
     });
+
+    console.log("[POST /api/appointments] rule found:", rule ? rule.id : "NONE (no rule matched)");
 
     if (!rule) {
       return NextResponse.json({
@@ -130,9 +157,12 @@ export async function POST(req: NextRequest) {
     const ruleEnd = new Date(dayStart);
     ruleEnd.setUTCHours(rule.endTime.getUTCHours(), rule.endTime.getUTCMinutes(), 0, 0);
 
+    console.log("[POST /api/appointments] ruleStart:", ruleStart.toISOString(), "| ruleEnd:", ruleEnd.toISOString(), "| slotStart:", slotStart.toISOString(), "| slotEnd:", slotEnd.toISOString());
+
     if (slotStart < ruleStart || slotEnd > ruleEnd) {
+      console.log("[POST /api/appointments] 400: slot outside working hours");
       return NextResponse.json({
-        error: "Selected time slot is outside the doctor's working hours.",
+        error: `Selected time slot is outside the doctor's working hours (${ruleStart.toISOString()} – ${ruleEnd.toISOString()}).`,
       }, { status: 400 });
     }
 
@@ -195,6 +225,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json(appointment, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    console.error("[POST /api/appointments] Unexpected error:", error);
+    return NextResponse.json({ error: error.message || "Internal server error" }, { status: 500 });
   }
 }

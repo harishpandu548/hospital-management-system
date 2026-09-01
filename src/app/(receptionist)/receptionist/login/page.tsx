@@ -54,10 +54,10 @@ const ReceptionistLoginPage = () => {
       }
 
       const displayName = data.name && !/^\+?\d{7,}$/.test(data.name) ? data.name : undefined;
-      localStorage.setItem('hms_token', data.token);
-      localStorage.setItem('hms_role', data.activeRole);
-      if (displayName) localStorage.setItem('userName', displayName);
-      localStorage.setItem('hms_welcome', JSON.stringify({ role: data.activeRole, name: displayName }));
+      localStorage.setItem('receptionist_token', data.token);
+      localStorage.setItem('receptionist_role', data.activeRole);
+      if (displayName) localStorage.setItem('receptionist_userName', displayName);
+      localStorage.setItem('receptionist_welcome', JSON.stringify({ role: data.activeRole, name: displayName }));
       router.push('/receptionist');
     } catch {
       setError('Something went wrong. Please try again.');

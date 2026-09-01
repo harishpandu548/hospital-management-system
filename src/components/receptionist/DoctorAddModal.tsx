@@ -9,7 +9,7 @@ const specialities = [
 ];
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const DoctorAddModal = ({ isOpen, onClose, onAdd }: any) => {
   const [formData, setFormData] = useState({

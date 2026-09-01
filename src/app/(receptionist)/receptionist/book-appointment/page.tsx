@@ -6,7 +6,7 @@ import { useAppointments } from '@/context/receptionist/AppointmentsContext';
 import '@/styles/receptionist/doctor-add-modal.css';
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const BookAppointmentPage = () => {
   const router = useRouter();

@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { pageVariants, staggerContainer, fadeUp, scaleUp } from '@/lib/animations';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
 const Sk = ({ w = '80%', h = 14, r = 6 }: { w?: string | number; h?: number; r?: number }) => (
   <div style={{ width: w, height: h, borderRadius: r, background: 'linear-gradient(90deg,#f1f5f9 25%,#e2e8f0 50%,#f1f5f9 75%)', backgroundSize: '200% 100%', animation: 'shimmer 1.4s infinite' }} />
@@ -142,13 +142,12 @@ const AdminDashboard = () => {
   const router = useRouter();
   const [stats, setStats] = useState({ doctors: 0, patients: 0, appointments: 0, receptionists: 0 });
   const [recentAppts, setRecentAppts] = useState<any[]>([]);
-  const [recentLogs, setRecentLogs] = useState<any[]>([]);
   const [statusBreakdown, setStatusBreakdown] = useState<Record<string, number>>({});
   const [todayCount, setTodayCount] = useState(0);
   const [trendData, setTrendData] = useState<number[]>([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+  const fetchDashboardData = () => {
     const token = getToken();
     if (!token) return;
     const h = { Authorization: `Bearer ${token}` };
@@ -157,8 +156,7 @@ const AdminDashboard = () => {
       fetch('/api/patients', { headers: h }).then(r => r.ok ? r.json() : []),
       fetch('/api/appointments', { headers: h }).then(r => r.ok ? r.json() : []),
       fetch('/api/admin/users?role=RECEPTIONIST', { headers: h }).then(r => r.ok ? r.json() : []),
-      fetch('/api/audit-logs', { headers: h }).then(r => r.ok ? r.json() : []),
-    ]).then(([doctors, patients, appointments, receptionists, logs]) => {
+    ]).then(([doctors, patients, appointments, receptionists]) => {
       const appts = Array.isArray(appointments) ? appointments : [];
       const today = new Date().toDateString();
       const todayAppts = appts.filter((a: any) => new Date(a.appointmentDate).toDateString() === today);
@@ -176,8 +174,26 @@ const AdminDashboard = () => {
       setRecentAppts(appts.slice(0, 6));
       setStatusBreakdown(breakdown);
       setTrendData(trend);
-      setRecentLogs(Array.isArray(logs) ? logs.slice(0, 5) : []);
     }).catch(() => {}).finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
+
+    // Connect to WebSocket to receive real-time dashboard updates
+    let socket: any;
+    import('socket.io-client').then(({ io }) => {
+      socket = io('http://localhost:3001');
+      socket.emit('join-admin');
+      socket.on('appointment-update', () => {
+        // Silently refresh stats in the background
+        fetchDashboardData();
+      });
+    });
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
   }, []);
 
   const statCards = [
@@ -404,53 +420,6 @@ const AdminDashboard = () => {
                   />
                 </div>
               </motion.div>
-            )}
-          </motion.div>
-
-          {/* Recent Audit Logs */}
-          <motion.div
-            initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.44 }}
-            style={{ background: '#fff', borderRadius: 16, border: '1px solid #e2e8f0', boxShadow: '0 2px 12px rgba(15,23,42,0.07)', overflow: 'hidden' }}
-          >
-            <div style={{ padding: '16px 20px', borderBottom: '1px solid #f1f5f9', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-              <div style={{ fontWeight: 700, fontSize: 15, color: '#0f172a' }}>Recent Activity</div>
-              <motion.button
-                onClick={() => router.push('/admin/audit-logs')}
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.96 }}
-                style={{ background: 'none', border: 'none', color: '#6366f1', fontWeight: 600, fontSize: 12, cursor: 'pointer' }}
-              >
-                View All →
-              </motion.button>
-            </div>
-            {loading ? (
-              <div style={{ padding: '14px 20px', display: 'flex', flexDirection: 'column', gap: 10 }}>{[1,2,3].map(k => <Sk key={k} h={14} />)}</div>
-            ) : recentLogs.length === 0 ? (
-              <div style={{ padding: '16px 20px', color: '#94a3b8', fontSize: 13 }}>No recent activity.</div>
-            ) : (
-              <div>
-                {recentLogs.map((log, i) => (
-                  <motion.div
-                    key={log.id || i}
-                    initial={{ opacity: 0, x: 8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.46 + i * 0.04 }}
-                    style={{ padding: '11px 20px', borderBottom: i < recentLogs.length - 1 ? '1px solid #f8fafc' : 'none', display: 'flex', alignItems: 'center', gap: 10 }}
-                    onMouseEnter={e => (e.currentTarget.style.background = '#fafafa')}
-                    onMouseLeave={e => (e.currentTarget.style.background = 'transparent')}
-                  >
-                    <div style={{ width: 7, height: 7, borderRadius: '50%', background: log.action === 'CREATE' ? '#10b981' : log.action?.includes('CANCEL') ? '#ef4444' : '#f59e0b', flexShrink: 0 }} />
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 12, fontWeight: 600, color: '#334155', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                        {log.action?.replace(/_/g, ' ')} · {log.entityName || log.entityType}
-                      </div>
-                      <div style={{ fontSize: 11, color: '#94a3b8', marginTop: 1 }}>
-                        by {log.performedByName || '—'} · {log.createdAt ? new Date(log.createdAt).toLocaleString() : '—'}
-                      </div>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
             )}
           </motion.div>
         </div>

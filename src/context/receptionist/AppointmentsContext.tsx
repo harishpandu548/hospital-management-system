@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 function calculateAge(dateOfBirth: string | null | undefined): number | string {
   if (!dateOfBirth) return '-';
@@ -94,6 +94,24 @@ export const AppointmentsProvider = ({ children }: { children: React.ReactNode }
 
   useEffect(() => {
     fetchAppointments();
+
+    // Connect to WebSocket to receive real-time updates
+    let socket: any;
+    import('socket.io-client').then(({ io }) => {
+      socket = io('http://localhost:3001');
+      socket.emit('join-receptionist');
+      socket.on('appointment-update', () => {
+        // Silently refresh appointments in the background
+        fetchAppointments();
+      });
+      socket.on('payment-updated', () => {
+        fetchAppointments();
+      });
+    });
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
   }, [fetchAppointments]);
 
   return (

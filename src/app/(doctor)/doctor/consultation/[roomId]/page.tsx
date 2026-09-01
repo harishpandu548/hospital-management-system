@@ -4,15 +4,15 @@ import { useParams, useRouter } from 'next/navigation';
 import {
   FiMic, FiMicOff, FiVideo, FiVideoOff,
   FiPhoneOff, FiSend, FiPaperclip,
-  FiMessageSquare, FiFile, FiImage, FiFileText,
+  FiMessageSquare, FiFile, FiImage, FiFileText, FiX
 } from 'react-icons/fi';
+import { io, Socket } from 'socket.io-client';
 
 /* reuse the same CSS (served from public via Next.js module resolution) */
 const ICE_SERVERS = [
   { urls: 'stun:stun.l.google.com:19302' },
   { urls: 'stun:stun1.l.google.com:19302' },
 ];
-const POLL_MS = 1500;
 
 function fileIcon(type = '') {
   if (type.startsWith('image/')) return <FiImage size={18} />;
@@ -24,12 +24,12 @@ function fileIcon(type = '') {
 const S = {
   shell: { display:'flex', flexDirection:'column' as const, height:'calc(100vh - 0px)', background:'#0a0f1e', color:'#f1f5f9', overflow:'hidden' },
   topbar: { display:'flex', alignItems:'center', justifyContent:'space-between', padding:'12px 20px', background:'rgba(15,23,42,0.85)', backdropFilter:'blur(12px)', borderBottom:'1px solid rgba(255,255,255,0.07)', flexShrink:0 as const },
-  body: { display:'grid', gridTemplateColumns:'1fr 340px', flex:1, minHeight:0, overflow:'hidden' },
-  videoSide: { display:'flex', flexDirection:'column' as const, background:'#0a0f1e', position:'relative' as const, overflow:'hidden' },
+  body: { position:'relative' as const, flex:1, minHeight:0, overflow:'hidden' },
+  videoSide: { position:'absolute' as const, inset:0, display:'flex', flexDirection:'column' as const, background:'#0a0f1e', overflow:'hidden' },
   videoMain: { flex:1, position:'relative' as const, overflow:'hidden', display:'flex', alignItems:'center', justifyContent:'center' },
-  selfVid: { position:'absolute' as const, bottom:16, right:16, width:160, height:116, borderRadius:14, overflow:'hidden', border:'2px solid rgba(16,185,129,0.5)', boxShadow:'0 8px 24px rgba(0,0,0,0.4)', background:'#1e293b', cursor:'pointer' },
-  controls: { display:'flex', alignItems:'center', justifyContent:'center', gap:14, padding:'16px 20px', background:'rgba(15,23,42,0.75)', backdropFilter:'blur(12px)', borderTop:'1px solid rgba(255,255,255,0.06)', flexShrink:0 as const },
-  chatSide: { display:'flex', flexDirection:'column' as const, background:'#0f172a', borderLeft:'1px solid rgba(255,255,255,0.07)', overflow:'hidden' },
+  selfVid: { position:'absolute' as const, bottom:110, right:32, width:160, height:116, borderRadius:14, overflow:'hidden', border:'2px solid rgba(16,185,129,0.5)', boxShadow:'0 8px 24px rgba(0,0,0,0.4)', background:'#1e293b', cursor:'pointer', zIndex:10 },
+  controls: { position:'absolute' as const, bottom:32, left:'50%', transform:'translateX(-50%)', display:'flex', alignItems:'center', justifyContent:'center', gap:14, padding:'12px 24px', background:'rgba(15,23,42,0.85)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.06)', borderRadius:20, boxShadow:'0 8px 32px rgba(0,0,0,0.5)', zIndex:10 },
+  chatSide: { position:'absolute' as const, top:0, bottom:0, right:0, width:340, display:'flex', flexDirection:'column' as const, background:'#0f172a', borderLeft:'1px solid rgba(255,255,255,0.07)', overflow:'hidden', zIndex:20, boxShadow:'-4px 0 32px rgba(0,0,0,0.5)', transition:'transform 0.3s cubic-bezier(0.16, 1, 0.3, 1)' },
   chatHead: { padding:'14px 18px', borderBottom:'1px solid rgba(255,255,255,0.07)', display:'flex', alignItems:'center', gap:8, fontSize:14, fontWeight:700, color:'#e2e8f0', flexShrink:0 },
   chatMsgs: { flex:1, overflowY:'auto' as const, padding:'14px 14px 8px', display:'flex', flexDirection:'column' as const, gap:10, scrollBehavior:'smooth' as const },
   chatInput: { padding:'12px 14px', borderTop:'1px solid rgba(255,255,255,0.07)', flexShrink:0 },
@@ -49,20 +49,22 @@ export default function DoctorCallRoom() {
   const [uploading, setUploading] = useState(false);
   const [dragging, setDragging] = useState(false);
   const [err, setErr]           = useState('');
+  const [showChat, setShowChat] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const localVid   = useRef<HTMLVideoElement>(null);
   const remoteVid  = useRef<HTMLVideoElement>(null);
   const pcRef      = useRef<RTCPeerConnection | null>(null);
   const streamRef  = useRef<MediaStream | null>(null);
-  const lastSigId  = useRef('');
-  const lastMsgId  = useRef('');
+  const socketRef  = useRef<Socket | null>(null);
+  const typingTimeout = useRef<NodeJS.Timeout | null>(null);
+  const [isOtherTyping, setIsOtherTyping] = useState(false);
+  
   const answered   = useRef(false);
-  const sigTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
-  const msgTimer   = useRef<ReturnType<typeof setInterval> | null>(null);
   const chatEnd    = useRef<HTMLDivElement>(null);
   const fileInput  = useRef<HTMLInputElement>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') ?? '' : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('doctor_token') ?? '' : '';
   const H = { Authorization: `Bearer ${token}` };
 
   // fixed auto-scroll
@@ -70,26 +72,18 @@ export default function DoctorCallRoom() {
     chatEnd.current?.scrollIntoView({ behavior: 'smooth', block: 'end' });
   }, [messages]);
 
-  const pollMsgs = useCallback(async () => {
-    const res = await fetch(`/api/consultations/${roomId}/messages?afterId=${lastMsgId.current}`, { headers: H });
+  const fetchInitialMsgs = useCallback(async () => {
+    const res = await fetch(`/api/consultations/${roomId}/messages`, { headers: H });
     if (!res.ok) return;
     const list: any[] = await res.json();
-    if (!list.length) return;
-    lastMsgId.current = list[list.length - 1].id;
-    setMessages((prev) => {
-      const seen = new Set(prev.map((m) => m.id));
-      return [...prev, ...list.filter((m) => !seen.has(m.id))];
-    });
+    setMessages(list);
   }, [roomId]);
 
   const buildPC = useCallback(() => {
     const pc = new RTCPeerConnection({ iceServers: ICE_SERVERS });
-    pc.onicecandidate = async (e) => {
+    pc.onicecandidate = (e) => {
       if (!e.candidate) return;
-      await fetch(`/api/consultations/${roomId}/signal`, {
-        method:'POST', headers:{ ...H,'Content-Type':'application/json' },
-        body: JSON.stringify({ type:'ice-candidate', payload:e.candidate }),
-      });
+      socketRef.current?.emit('signal', { roomId, type: 'ice-candidate', payload: e.candidate, senderRole: 'DOCTOR' });
     };
     pc.ontrack = (e) => {
       if (remoteVid.current) { remoteVid.current.srcObject = e.streams[0]; setCallStatus('connected'); }
@@ -100,16 +94,15 @@ export default function DoctorCallRoom() {
     return pc;
   }, [roomId]);
 
-  // doctor = answerer
-  const pollSignals = useCallback(async () => {
-    const res = await fetch(`/api/consultations/${roomId}/signal?lastId=${lastSigId.current}&myRole=DOCTOR`, { headers: H });
-    if (!res.ok) return;
-    const sigs: any[] = await res.json();
-    if (!sigs.length) return;
-    lastSigId.current = sigs[sigs.length - 1].id;
-    for (const s of sigs) {
-      const payload = JSON.parse(s.payload);
-      if (s.type === 'offer' && !answered.current) {
+  const initSocket = useCallback(() => {
+    const socket = io('http://localhost:3001');
+    socketRef.current = socket;
+    
+    socket.emit('join-room', roomId);
+    
+    socket.on('signal', async (data) => {
+      if (data.senderRole === 'DOCTOR') return; // Ignore own
+      if (data.type === 'offer' && !answered.current) {
         answered.current = true;
         setCallStatus('connecting');
         try {
@@ -118,42 +111,56 @@ export default function DoctorCallRoom() {
           if (localVid.current) localVid.current.srcObject = stream;
           const pc = buildPC(); pcRef.current = pc;
           stream.getTracks().forEach((t) => pc.addTrack(t, stream));
-          await pc.setRemoteDescription(new RTCSessionDescription(payload));
+          await pc.setRemoteDescription(new RTCSessionDescription(data.payload));
           const answer = await pc.createAnswer();
           await pc.setLocalDescription(answer);
-          await fetch(`/api/consultations/${roomId}/signal`, {
-            method:'POST', headers:{ ...H,'Content-Type':'application/json' },
-            body: JSON.stringify({ type:'answer', payload:answer }),
-          });
+          socketRef.current?.emit('signal', { roomId, type: 'answer', payload: answer, senderRole: 'DOCTOR' });
         } catch {
           setErr('Could not access camera/microphone.');
           setCallStatus('idle'); answered.current = false;
         }
-      } else if (s.type === 'ice-candidate' && pcRef.current) {
-        try { await pcRef.current.addIceCandidate(new RTCIceCandidate(payload)); } catch { /**/ }
+      } else if (data.type === 'ice-candidate' && pcRef.current) {
+        try { await pcRef.current.addIceCandidate(new RTCIceCandidate(data.payload)); } catch { /**/ }
       }
-    }
+    });
+
+    socket.on('chat-message', (msg) => {
+      setMessages((prev) => {
+        if (prev.find(m => m.id === msg.id)) return prev;
+        return [...prev, msg];
+      });
+      setShowChat((prevShowChat) => {
+        if (!prevShowChat) setUnreadCount((c) => c + 1);
+        return prevShowChat;
+      });
+    });
+
+    socket.on('typing', (data) => {
+      if (data.role !== 'DOCTOR') {
+        setIsOtherTyping(true);
+        if (typingTimeout.current) clearTimeout(typingTimeout.current);
+        typingTimeout.current = setTimeout(() => setIsOtherTyping(false), 2000);
+      }
+    });
   }, [roomId, buildPC]);
 
   useEffect(() => {
     if (!token) { router.replace('/doctor/login'); return; }
+    
+    initSocket();
+
     fetch(`/api/consultations/${roomId}`, { headers:H }).then(r => r.ok ? r.json() : null).then(data => {
       if (!data) { router.replace('/doctor'); return; }
       setRoom(data);
-      pollMsgs();
-      // Only poll signals when room is active
-      if (data.status === 'ACTIVE' || data.status === 'PENDING') {
-        sigTimer.current = setInterval(pollSignals, POLL_MS);
-        msgTimer.current = setInterval(pollMsgs, POLL_MS);
-      }
+      fetchInitialMsgs();
     });
+    
     return () => {
-      if (sigTimer.current) clearInterval(sigTimer.current);
-      if (msgTimer.current) clearInterval(msgTimer.current);
       streamRef.current?.getTracks().forEach(t => t.stop());
       pcRef.current?.close();
+      socketRef.current?.disconnect();
     };
-  }, [roomId]);
+  }, [roomId, initSocket]);
 
   const toggleMic = () => { streamRef.current?.getAudioTracks().forEach(t => { t.enabled = !t.enabled; }); setMicOn(v => !v); };
   const toggleCam = () => { streamRef.current?.getVideoTracks().forEach(t => { t.enabled = !t.enabled; }); setCamOn(v => !v); };
@@ -180,7 +187,7 @@ export default function DoctorCallRoom() {
       if (res.ok) {
         const m = await res.json();
         setMessages(prev => prev.find(x => x.id === m.id) ? prev : [...prev, m]);
-        lastMsgId.current = m.id;
+        socketRef.current?.emit('chat-message', { roomId, message: m });
       }
     } catch { /**/ } finally { setSending(false); }
   };
@@ -200,7 +207,7 @@ export default function DoctorCallRoom() {
       if (res.ok) {
         const m = await res.json();
         setMessages(prev => prev.find(x => x.id === m.id) ? prev : [...prev, m]);
-        lastMsgId.current = m.id;
+        socketRef.current?.emit('chat-message', { roomId, message: m });
       }
     } catch { setErr('Upload failed'); } finally { setUploading(false); }
   };
@@ -231,6 +238,11 @@ export default function DoctorCallRoom() {
       {icon}
     </button>
   );
+
+  const handleToggleChat = () => {
+    setShowChat(prev => !prev);
+    if (!showChat) setUnreadCount(0);
+  };
 
   return (
     <div style={S.shell}>
@@ -268,7 +280,7 @@ export default function DoctorCallRoom() {
                     <span style={{ color:'#94a3b8',fontSize:14 }}>Connecting…</span>
                   </div>
                 )}
-                <div style={S.selfVid}><video ref={localVid} autoPlay playsInline muted style={{ width:'100%',height:'100%',objectFit:'cover',transform:'scaleX(-1)' }} /></div>
+                <div style={{ ...S.selfVid, right: showChat ? 372 : 32, transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}><video ref={localVid} autoPlay playsInline muted style={{ width:'100%',height:'100%',objectFit:'cover',transform:'scaleX(-1)' }} /></div>
               </>
             ) : (
               <div style={{ display:'flex',flexDirection:'column',alignItems:'center',gap:12,color:'#475569',padding:40,textAlign:'center' }}>
@@ -282,7 +294,7 @@ export default function DoctorCallRoom() {
           </div>
           {err && <div style={{ margin:'0 16px 12px',padding:'10px 14px',background:'rgba(239,68,68,0.15)',border:'1px solid rgba(239,68,68,0.3)',borderRadius:12,color:'#f87171',fontSize:13 }}>{err}</div>}
           {!isEnded && (
-            <div style={S.controls}>
+            <div style={{ ...S.controls, left: showChat ? 'calc(50% - 170px)' : '50%', transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)' }}>
               {ctrl(micOn, toggleMic, micOn ? <FiMic size={20}/> : <FiMicOff size={20}/>)}
               {ctrl(true, endCall, <FiPhoneOff size={22}/>, true, true)}
               {ctrl(camOn, toggleCam, camOn ? <FiVideo size={20}/> : <FiVideoOff size={20}/>)}
@@ -291,13 +303,20 @@ export default function DoctorCallRoom() {
         </div>
 
         {/* Chat */}
-        <div style={S.chatSide} onDragOver={(e)=>{e.preventDefault();setDragging(true);}} onDragLeave={()=>setDragging(false)} onDrop={(e)=>{e.preventDefault();setDragging(false);const f=e.dataTransfer.files?.[0];if(f)uploadFile(f);}}>
+        <div style={{ ...S.chatSide, transform: showChat ? 'translateX(0)' : 'translateX(100%)' }} onDragOver={(e)=>{e.preventDefault();setDragging(true);}} onDragLeave={()=>setDragging(false)} onDrop={(e)=>{e.preventDefault();setDragging(false);const f=e.dataTransfer.files?.[0];if(f)uploadFile(f);}}>
           <div style={S.chatHead}>
-            <FiMessageSquare size={15}/> Chat — {patientName}
-            {room.patient?.relation && room.patient.relation !== 'SELF' && <span style={{ fontSize:11,color:'#34d399',marginLeft:4,fontWeight:700 }}>({room.patient.relation})</span>}
-            <button onClick={() => setShowMedical((v:boolean) => !v)} style={{ marginLeft:'auto',padding:'4px 10px',borderRadius:8,background:'rgba(16,185,129,0.15)',border:'1px solid rgba(16,185,129,0.3)',color:'#34d399',fontSize:11,fontWeight:700,cursor:'pointer' }}>
-              {showMedical ? 'Hide' : 'Medical Info'}
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <FiMessageSquare size={15}/> Chat — {patientName}
+              {room.patient?.relation && room.patient.relation !== 'SELF' && <span style={{ fontSize:11,color:'#34d399',marginLeft:4,fontWeight:700 }}>({room.patient.relation})</span>}
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginLeft: 'auto' }}>
+              <button onClick={() => setShowMedical((v:boolean) => !v)} style={{ padding:'4px 10px',borderRadius:8,background:'rgba(16,185,129,0.15)',border:'1px solid rgba(16,185,129,0.3)',color:'#34d399',fontSize:11,fontWeight:700,cursor:'pointer' }}>
+                {showMedical ? 'Hide' : 'Medical Info'}
+              </button>
+              <button onClick={() => setShowChat(false)} style={{ background:'rgba(255,255,255,0.1)', border:'none', color:'#94a3b8', width:28, height:28, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer' }}>
+                <FiX size={16} />
+              </button>
+            </div>
           </div>
           {showMedical && patientDetail && (
             <div style={{ padding:'12px 16px',borderBottom:'1px solid rgba(255,255,255,0.07)',background:'rgba(16,185,129,0.06)',flexShrink:0 }}>
@@ -361,6 +380,13 @@ export default function DoctorCallRoom() {
             <div ref={chatEnd} style={{ height:1 }} />
           </div>
 
+          {isOtherTyping && (
+            <div style={{ padding: '0 14px 10px', fontSize: 11, color: '#94a3b8', fontStyle: 'italic', display: 'flex', alignItems: 'center', gap: 6 }}>
+              {patientName} is typing<span className="typing-dots" />
+              <style>{`@keyframes typingDots { 0% { content: "."; } 33% { content: ".."; } 66% { content: "..."; } } .typing-dots::after { content: "."; animation: typingDots 1.5s infinite; }`}</style>
+            </div>
+          )}
+
           {!isEnded && (
             <div style={S.chatInput}>
               {dragging && <div style={{ border:'2px dashed rgba(16,185,129,0.4)',borderRadius:14,padding:'14px 12px',marginBottom:10,textAlign:'center',color:'#10b981',fontSize:13,fontWeight:600,background:'rgba(16,185,129,0.05)' }}>Drop file here</div>}
@@ -370,7 +396,10 @@ export default function DoctorCallRoom() {
                   rows={2}
                   placeholder="Type a message…"
                   value={text}
-                  onChange={(e)=>setText(e.target.value)}
+                  onChange={(e) => {
+                    setText(e.target.value);
+                    socketRef.current?.emit('typing', { roomId, role: 'DOCTOR' });
+                  }}
                   onKeyDown={(e)=>{ if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();send();} }}
                   style={{ flex:1,background:'rgba(255,255,255,0.06)',border:'1px solid rgba(255,255,255,0.1)',borderRadius:14,padding:'10px 14px',color:'#f1f5f9',fontSize:13.5,resize:'none',outline:'none',fontFamily:'inherit',maxHeight:100,lineHeight:1.4 }}
                 />
@@ -381,6 +410,18 @@ export default function DoctorCallRoom() {
             </div>
           )}
         </div>
+
+        {/* Floating Chat Toggle Button */}
+        {!isEnded && room.status === 'ACTIVE' && (
+          <button 
+            onClick={handleToggleChat} 
+            title="Toggle Chat"
+            style={{ position:'absolute', bottom:32, right:32, width:60, height:60, borderRadius:'50%', background:'rgba(15,23,42,0.85)', backdropFilter:'blur(12px)', border:'1px solid rgba(255,255,255,0.1)', boxShadow:'0 8px 24px rgba(0,0,0,0.4)', display:'flex', alignItems:'center', justifyContent:'center', cursor:'pointer', color:'#f1f5f9', fontSize:24, zIndex:10, transition: 'all 0.3s cubic-bezier(0.16, 1, 0.3, 1)', opacity: showChat ? 0 : 1, transform: showChat ? 'translateX(100px)' : 'none', pointerEvents: showChat ? 'none' : 'auto' }}
+          >
+            <FiMessageSquare />
+            {unreadCount > 0 && <div style={{ position:'absolute', top:-4, right:-4, background:'#ef4444', color:'white', fontSize:11, fontWeight:'bold', borderRadius:12, padding:'2px 6px', minWidth:20, textAlign:'center', boxShadow:'0 2px 8px rgba(239,68,68,0.5)', border:'2px solid #0f172a' }}>{unreadCount}</div>}
+          </button>
+        )}
       </div>
     </div>
   );

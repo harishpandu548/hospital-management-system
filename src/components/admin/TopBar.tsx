@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import '@/styles/admin/top-bar.css';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
 const AdminTopBar = () => {
   const router = useRouter();

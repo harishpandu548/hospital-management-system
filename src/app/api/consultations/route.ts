@@ -149,6 +149,15 @@ export async function POST(req: NextRequest) {
         });
       }
 
+      await tx.auditLog.create({
+        data: {
+          entityType: "CONSULTATION",
+          entityId: created.id,
+          action: "CREATE_VIDEO_CALL",
+          performedBy: userId,
+        },
+      });
+
       return created;
     });
 

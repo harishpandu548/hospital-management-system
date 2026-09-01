@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 function transformDoctor(d: any) {
   return {

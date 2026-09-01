@@ -5,7 +5,7 @@ import '@/styles/receptionist/doctor-view-modal.css';
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const DoctorViewModal = ({ isOpen, onClose, doctor }: any) => {
   const [tab, setTab] = useState<'info' | 'availability' | 'login'>('info');

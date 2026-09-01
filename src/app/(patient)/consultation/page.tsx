@@ -35,7 +35,7 @@ export default function ConsultationPage() {
   const timerRef                      = useRef<ReturnType<typeof setInterval> | null>(null);
   const statusPollRef                 = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') ?? '' : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') ?? '' : '';
   const H = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {
@@ -114,6 +114,14 @@ export default function ConsultationPage() {
       });
       const data = await res.json();
       if (!res.ok) { setErr(data.error || 'Failed'); return; }
+
+      // Emit real-time notification to the doctor
+      import('socket.io-client').then(({ io }) => {
+        const socket = io('http://localhost:3001');
+        socket.emit('request-consultation', { doctorId: doc.id, consultation: data });
+        setTimeout(() => socket.disconnect(), 1500);
+      });
+
       startCountdown(data);
     } catch { setErr('Network error.'); } finally { setInitiating(false); }
   };

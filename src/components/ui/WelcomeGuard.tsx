@@ -2,21 +2,21 @@
 import { useEffect, useState } from 'react';
 import WelcomeToast from './WelcomeToast';
 
-const WelcomeGuard = () => {
+const WelcomeGuard = ({ storageKey = 'hms_welcome' }: { storageKey?: string }) => {
   const [data, setData] = useState<{ name?: string; role?: string } | null>(null);
 
   useEffect(() => {
     try {
-      const raw = localStorage.getItem('hms_welcome');
+      const raw = localStorage.getItem(storageKey);
       if (raw) {
         const parsed = JSON.parse(raw);
-        localStorage.removeItem('hms_welcome');
+        localStorage.removeItem(storageKey);
         setData(parsed);
       }
     } catch {
-      localStorage.removeItem('hms_welcome');
+      localStorage.removeItem(storageKey);
     }
-  }, []);
+  }, [storageKey]);
 
   if (!data) return null;
   return <WelcomeToast name={data.name} role={data.role} />;

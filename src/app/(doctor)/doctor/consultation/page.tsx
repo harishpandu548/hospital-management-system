@@ -15,7 +15,7 @@ export default function DoctorConsultationsPage() {
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState<string | null>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('doctor_token') : '';
   const authHeader = { Authorization: `Bearer ${token}` };
 
   useEffect(() => {

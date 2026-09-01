@@ -89,6 +89,15 @@ export async function POST(req: NextRequest) {
         }
       });
 
+      await tx.auditLog.create({
+        data: {
+          entityType: "DOCTOR",
+          entityId: doctor.id,
+          action: "CREATE",
+          performedBy: userId,
+        },
+      });
+
       return doctor;
     });
 

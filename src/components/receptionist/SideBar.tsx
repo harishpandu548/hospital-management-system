@@ -1,4 +1,5 @@
 'use client';
+import React from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
@@ -65,10 +66,15 @@ const navItems = [
 const SideBar = () => {
   const pathname = usePathname();
   const router = useRouter();
-  const username =
-    typeof window !== 'undefined' ? localStorage.getItem('userName') || 'Staff' : 'Staff';
-  const role =
-    typeof window !== 'undefined' ? localStorage.getItem('hms_role') || 'RECEPTIONIST' : 'RECEPTIONIST';
+  const [username, setUsername] = React.useState('Staff');
+  const [role, setRole] = React.useState('RECEPTIONIST');
+
+  React.useEffect(() => {
+    const storedName = localStorage.getItem('receptionist_userName') || localStorage.getItem('userName');
+    if (storedName) setUsername(storedName);
+    const storedRole = localStorage.getItem('receptionist_role') || 'RECEPTIONIST';
+    setRole(storedRole);
+  }, []);
 
   const isActive = (href: string, exact?: boolean) =>
     exact ? pathname === href : pathname === href || pathname.startsWith(href + '/');

@@ -23,7 +23,7 @@ const AppointmentModal = ({ isOpen, onClose, appointment, onUpdate, onDelete, on
     setSaving(true);
     setSaveError('');
     setSaveSuccess(false);
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
     const apptId = appointment._raw?.id || appointment.id;
 
     try {

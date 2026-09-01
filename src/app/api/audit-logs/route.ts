@@ -18,7 +18,7 @@ export async function GET(req: NextRequest) {
     // ── Resolve performer names ──────────────────────────────────────────────
     const performerIds = [...new Set(logs.map((l) => l.performedBy).filter(Boolean))];
 
-    const [patients, doctors] = await Promise.all([
+    const [patients, doctors, users] = await Promise.all([
       prisma.patient.findMany({
         where: { userId: { in: performerIds } },
         select: { userId: true, firstName: true, lastName: true },
@@ -26,6 +26,10 @@ export async function GET(req: NextRequest) {
       prisma.doctor.findMany({
         where: { userId: { in: performerIds } },
         select: { userId: true, fullname: true },
+      }),
+      prisma.user.findMany({
+        where: { id: { in: performerIds } },
+        select: { id: true, email: true, phone: true },
       }),
     ]);
 
@@ -35,9 +39,12 @@ export async function GET(req: NextRequest) {
     const doctorByUser = Object.fromEntries(
       doctors.map((d) => [d.userId, d.fullname])
     );
+    const userById = Object.fromEntries(
+      users.map((u) => [u.id, u.email?.split('@')[0] || u.phone])
+    );
 
     const resolvePerformer = (uid: string) =>
-      patientByUser[uid] || doctorByUser[uid] || uid.slice(0, 12) + "…";
+      patientByUser[uid] || doctorByUser[uid] || userById[uid] || "System";
 
     // ── Resolve entity names by type ─────────────────────────────────────────
     const apptIds = logs.filter((l) => l.entityType === "APPOINTMENT").map((l) => l.entityId);
@@ -74,7 +81,7 @@ export async function GET(req: NextRequest) {
         a.id,
         a.patient
           ? `${a.patient.firstName} ${a.patient.lastName}${a.doctor ? ` → Dr. ${a.doctor.fullname}` : ""}`
-          : a.id.slice(0, 12) + "…",
+          : "",
       ])
     );
     const doctorEntityMap = Object.fromEntries(
@@ -85,17 +92,30 @@ export async function GET(req: NextRequest) {
     );
 
     const resolveEntity = (entityType: string, entityId: string) => {
-      if (entityType === "APPOINTMENT") return apptMap[entityId] || entityId.slice(0, 12) + "…";
-      if (entityType === "DOCTOR") return doctorEntityMap[entityId] || entityId.slice(0, 12) + "…";
-      if (entityType === "PATIENT") return patientEntityMap[entityId] || entityId.slice(0, 12) + "…";
-      return entityId.slice(0, 12) + "…";
+      if (entityType === "APPOINTMENT") return apptMap[entityId] || "";
+      if (entityType === "DOCTOR") return doctorEntityMap[entityId] || "";
+      if (entityType === "PATIENT") return patientEntityMap[entityId] || "";
+      return "";
     };
 
-    const enriched = logs.map((log) => ({
-      ...log,
-      performedByName: resolvePerformer(log.performedBy),
-      entityName: resolveEntity(log.entityType, log.entityId),
-    }));
+    const enriched = logs.map((log) => {
+      const eName = resolveEntity(log.entityType, log.entityId);
+      let actionText = log.action;
+      if (log.action === 'CREATE' && log.entityType === 'APPOINTMENT') actionText = 'Booked appointment';
+      else if (log.action === 'CREATE' && log.entityType === 'PATIENT') actionText = 'Registered new patient';
+      else if (log.action === 'CREATE' && log.entityType === 'DOCTOR') actionText = 'Added new doctor';
+      else if (log.action === 'STATUS CHANGE') actionText = 'Updated appointment status';
+      else if (log.action === 'APPOINTMENT CANCELLED') actionText = 'Cancelled appointment';
+      else if (log.action === 'USER_LOGIN') actionText = 'Logged into the system';
+      else if (log.action === 'CREATE_VIDEO_CALL') actionText = 'Started a video consultation';
+
+      return {
+        ...log,
+        performedByName: resolvePerformer(log.performedBy),
+        entityName: eName,
+        action: actionText
+      };
+    });
 
     return NextResponse.json(enriched);
   } catch (error: any) {

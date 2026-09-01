@@ -30,7 +30,7 @@ const SkeletonRow = () => (
 );
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const AppointmentsPage = () => {
   const router = useRouter();

@@ -2,7 +2,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
 const inputStyle: React.CSSProperties = {
   width: '100%', padding: '10px 12px', borderRadius: 10,

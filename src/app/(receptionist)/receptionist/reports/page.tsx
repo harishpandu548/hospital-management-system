@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const STATUS_COLORS: Record<string, { bg: string; color: string; label: string }> = {
   SCHEDULED:   { bg: '#eff6ff', color: '#2563eb', label: 'Scheduled' },

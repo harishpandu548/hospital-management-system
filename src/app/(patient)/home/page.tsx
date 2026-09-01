@@ -93,8 +93,8 @@ export default function PatientDashboard() {
   const uploadRef                           = useRef<HTMLInputElement>(null);
   const [uploading, setUploading]           = useState(false);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') ?? '' : '';
-  const role  = typeof window !== 'undefined' ? localStorage.getItem('hms_role') ?? '' : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') ?? '' : '';
+  const role  = typeof window !== 'undefined' ? localStorage.getItem('patient_role') ?? '' : '';
   const auth  = { Authorization: `Bearer ${token}` };
 
   const load = useCallback(async () => {
@@ -114,7 +114,7 @@ export default function PatientDashboard() {
       const self = profiles.find((p) => p.relation === 'SELF') ?? profiles[0] ?? null;
       if (self) {
         localStorage.setItem('patientId', self.id);
-        localStorage.setItem('userName', self.firstName);
+        localStorage.setItem('patient_userName', self.firstName);
       }
       setProfile(self);
       setFamilyProfiles(profiles.filter((p) => p.id !== self?.id));

@@ -11,31 +11,59 @@ export default function Navbar() {
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [notifOpen, setNotifOpen]       = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [username, setUsername]         = useState('User');
   const navRef = useRef<HTMLElement>(null);
   const router = useRouter();
 
-  const username = typeof window !== 'undefined' ? localStorage.getItem('userName') || 'User' : 'User';
+  // Read username from localStorage only after mount to avoid hydration mismatch
+  useEffect(() => {
+    const stored = localStorage.getItem('patient_userName') || localStorage.getItem('userName');
+    if (stored) setUsername(stored);
+  }, []);
+
   const pathname = usePathname();
   const path     = pathname.toLowerCase().replace(/\/+$/, '');
   const hide     = ['/login', '/signup'].includes(path);
 
-  // Poll notifications every 30s
+  // Real-time notifications via WebSockets
   useEffect(() => {
     if (hide) return;
     const fetchNotifs = async () => {
-      const token = localStorage.getItem('hms_token');
+      const token = localStorage.getItem('patient_token');
       if (!token) return;
-      const res = await fetch('/api/notifications', { headers: { Authorization: `Bearer ${token}` } });
-      if (res.ok) setNotifications(await res.json());
+      try {
+        const res = await fetch('/api/notifications', { headers: { Authorization: `Bearer ${token}` } });
+        if (res.ok) setNotifications(await res.json());
+      } catch (e) { /**/ }
     };
     fetchNotifs();
-    const t = setInterval(fetchNotifs, 30000);
-    return () => clearInterval(t);
+
+    // Setup WebSocket
+    let socket: any = null;
+    import('socket.io-client').then(({ io }) => {
+      socket = io('http://localhost:3001');
+      const token = localStorage.getItem('patient_token');
+      if (token) {
+        try {
+          const payload = JSON.parse(atob(token.split('.')[1]));
+          if (payload.id || payload.userId) {
+            socket.emit('join-notifications', payload.id || payload.userId);
+            socket.on('new-notification', (notif: any) => {
+              setNotifications((prev) => [notif, ...prev]);
+            });
+          }
+        } catch (e) { /**/ }
+      }
+    });
+
+    return () => {
+      if (socket) socket.disconnect();
+    };
   }, [hide]);
 
   const dismissNotif = async (id: string) => {
     setNotifications((prev) => prev.filter((n) => n.id !== id));
-    const token = localStorage.getItem('hms_token');
+    const token = localStorage.getItem('patient_token');
     await fetch('/api/notifications', {
       method: 'DELETE',
       headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },

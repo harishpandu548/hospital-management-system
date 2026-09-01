@@ -53,10 +53,10 @@ const AdminLoginPage = () => {
         return;
       }
       const displayName = data.name && !/^\+?\d{7,}$/.test(data.name) ? data.name : undefined;
-      localStorage.setItem('hms_token', data.token);
-      localStorage.setItem('hms_role', data.activeRole);
-      if (displayName) localStorage.setItem('userName', displayName);
-      localStorage.setItem('hms_welcome', JSON.stringify({ role: data.activeRole, name: displayName }));
+      localStorage.setItem('admin_token', data.token);
+      localStorage.setItem('admin_role', data.activeRole);
+      if (displayName) localStorage.setItem('admin_userName', displayName);
+      localStorage.setItem('admin_welcome', JSON.stringify({ role: data.activeRole, name: displayName }));
       router.push('/admin');
     } catch {
       setError('Something went wrong. Please try again.');

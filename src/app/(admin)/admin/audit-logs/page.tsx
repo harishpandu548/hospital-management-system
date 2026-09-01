@@ -2,12 +2,16 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { motion } from 'framer-motion';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
 const ACTION_COLORS: Record<string, { bg: string; color: string }> = {
-  CREATE: { bg: '#f0fdf4', color: '#16a34a' },
-  STATUS_CHANGE: { bg: '#eff6ff', color: '#2563eb' },
-  APPOINTMENT_CANCELLED: { bg: '#fef2f2', color: '#dc2626' },
+  'Booked appointment': { bg: '#f0fdf4', color: '#16a34a' }, // Green
+  'Registered new patient': { bg: '#f0fdf4', color: '#16a34a' },
+  'Added new doctor': { bg: '#f0fdf4', color: '#16a34a' },
+  'Updated appointment status': { bg: '#eff6ff', color: '#2563eb' }, // Blue
+  'Cancelled appointment': { bg: '#fef2f2', color: '#dc2626' }, // Red
+  'Logged into the system': { bg: '#fffbeb', color: '#d97706' }, // Orange/Yellow
+  'Started a video consultation': { bg: '#fdf4ff', color: '#c026d3' }, // Purple
   DELETE: { bg: '#fef2f2', color: '#dc2626' },
   UPDATE: { bg: '#fffbeb', color: '#d97706' },
 };
@@ -123,7 +127,7 @@ const AuditLogsPage = () => {
                     </td>
                     <td style={{ padding: '12px 16px', color: '#374151', fontWeight: 500 }}>{log.entityType}</td>
                     <td style={{ padding: '12px 16px', color: '#374151', fontSize: 12, fontWeight: 500 }}>
-                      {log.entityName || (log.entityId?.slice(0, 14) + '…')}
+                      {log.entityName || '-'}
                     </td>
                     <td style={{ padding: '12px 16px', color: '#374151', fontSize: 12, fontWeight: 500 }}>
                       {log.performedByName || (log.performedBy?.slice(0, 14) + '…')}

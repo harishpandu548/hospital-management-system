@@ -7,7 +7,7 @@ import { pageVariants, staggerContainer, fadeUp, fadeLeft } from '@/lib/animatio
 import { FiFile, FiImage, FiFileText, FiExternalLink, FiHeart } from 'react-icons/fi';
 
 const getToken = () =>
-  typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+  typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 function calculateAge(dob: string | null | undefined): string {
   if (!dob) return '-';

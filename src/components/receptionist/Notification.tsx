@@ -49,7 +49,7 @@ const Notification = () => {
   const containerRef = useRef<HTMLDivElement>(null);
 
   const fetchNotifs = async () => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
     if (!token) return;
     setLoading(true);
     try {

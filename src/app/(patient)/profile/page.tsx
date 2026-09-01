@@ -22,7 +22,7 @@ export default function ProfilePage() {
   const [familySaving, setFamilySaving] = useState(false);
   const [familyError, setFamilyError] = useState('');
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : '';
   const auth = { Authorization: `Bearer ${token}` };
 
   const load = useCallback(async () => {
@@ -33,7 +33,7 @@ export default function ProfilePage() {
   }, [token]);
 
   useEffect(() => {
-    if (!token || localStorage.getItem('hms_role') !== 'PATIENT') { router.replace('/login'); return; }
+    if (!token || localStorage.getItem('patient_role') !== 'PATIENT') { router.replace('/login'); return; }
     load();
   }, [load]);
 

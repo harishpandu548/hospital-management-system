@@ -82,6 +82,16 @@ export async function POST(req: NextRequest) {
     }
 
     const token = signToken(user.id, resolvedRole);
+
+    await prisma.auditLog.create({
+      data: {
+        entityType: "USER",
+        entityId: user.id,
+        action: "USER_LOGIN",
+        performedBy: user.id,
+      },
+    });
+
     return NextResponse.json({ token, activeRole: resolvedRole, name });
   } catch {
     return NextResponse.json({ error: "Login failed" }, { status: 500 });

@@ -8,6 +8,7 @@ import ThreeDotMenu from '@/components/patient/ThreeDotMenu';
 import { useDoctors } from '@/context/patient/DoctorsContext';
 import { SPECIALTY_COLORS } from '@/data/patient/constants';
 import { staggerContainer, fadeUp, scaleUp, pageVariants } from '@/lib/animations';
+import { io } from 'socket.io-client';
 import '@/styles/patient/doctors-appointment.css';
 
 const DoctorsAppointmentPage = () => {
@@ -20,6 +21,29 @@ const DoctorsAppointmentPage = () => {
   const [selectedDoctor, setSelectedDoctor]   = useState<any>(null);
   const [isModalOpen, setIsModalOpen]         = useState(false);
   const [searchTerm, setSearchTerm]           = useState('');
+  const [availableDoctorIds, setAvailableDoctorIds] = useState<Set<string>>(new Set());
+
+  useEffect(() => {
+    // Fetch initial availability
+    const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : null;
+    fetch('/api/doctors/availability-status', { headers: { Authorization: `Bearer ${token}` } })
+      .then(r => r.ok ? r.json() : { availableIds: [] })
+      .then(d => setAvailableDoctorIds(new Set(d.availableIds || [])))
+      .catch(() => {});
+
+    // Listen to real-time status updates
+    const socket = io('http://localhost:3001');
+    socket.on('doctor-status-changed', (data: { doctorId: string, available: boolean }) => {
+      setAvailableDoctorIds(prev => {
+        const next = new Set(prev);
+        if (data.available) next.add(data.doctorId);
+        else next.delete(data.doctorId);
+        return next;
+      });
+    });
+
+    return () => { socket.disconnect(); };
+  }, []);
 
   const specialities     = ['All', ...new Set(doctorsData.map((d: any) => d.speciality))];
   const normalizedSearch = searchTerm.trim().toLowerCase();
@@ -136,7 +160,15 @@ const DoctorsAppointmentPage = () => {
                       </svg>
                     </div>
                   </motion.div>
-                  <h3 className="doctor-name">{doctor.name}</h3>
+                  <h3 className="doctor-name" style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                    {doctor.name}
+                    {availableDoctorIds.has(doctor.id) && (
+                      <span style={{ fontSize: 11, color: '#10b981', display: 'inline-flex', alignItems: 'center', gap: 4, background: '#ecfdf5', padding: '2px 8px', borderRadius: 12, border: '1px solid #a7f3d0' }}>
+                        <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#10b981', animation: 'pulse 1.5s infinite' }} />
+                        Live
+                      </span>
+                    )}
+                  </h3>
                   <div className="doctor-info">
                     <p className="doctor-detail">Experience: {doctor.experience}</p>
                     <p className="doctor-detail">Qualification: {doctor.qualification}</p>

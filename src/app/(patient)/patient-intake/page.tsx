@@ -59,11 +59,11 @@ export default function PatientIntakePage() {
   const [familyUploading, setFamilyUploading] = useState(false);
   const familyFileRef = useRef<HTMLInputElement>(null);
 
-  const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') ?? '' : '';
+  const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') ?? '' : '';
   const auth  = { Authorization: `Bearer ${token}` };
 
   const load = useCallback(async () => {
-    if (!token || localStorage.getItem('hms_role') !== 'PATIENT') { router.replace('/login'); return; }
+    if (!token || localStorage.getItem('patient_role') !== 'PATIENT') { router.replace('/login'); return; }
     const res = await fetch('/api/patients/family', { headers: auth });
     if (!res.ok) { router.replace('/home'); return; }
     const data: any[] = await res.json();
@@ -73,7 +73,7 @@ export default function PatientIntakePage() {
     setNotes(self.medicalNotes || '');
     setFamilyMembers(data.filter(p => p.id !== self.id));
     localStorage.setItem('patientId', self.id);
-    localStorage.setItem('userName', self.firstName);
+    localStorage.setItem('patient_userName', self.firstName);
     setLoading(false);
   }, [token]);
 

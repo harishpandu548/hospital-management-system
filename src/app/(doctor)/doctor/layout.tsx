@@ -40,7 +40,7 @@ export default function DoctorLayout({ children }: { children: React.ReactNode }
           © {new Date().getFullYear()} HMS Doctor Portal
         </footer>
       </div>
-      <WelcomeGuard />
+      <WelcomeGuard storageKey="doctor_welcome" />
     </div>
   );
 }

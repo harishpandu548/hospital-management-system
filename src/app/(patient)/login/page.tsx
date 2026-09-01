@@ -52,10 +52,10 @@ const LoginPage = () => {
       }
 
       const displayName = data.name && !/^\+?\d{7,}$/.test(data.name) ? data.name : undefined;
-      localStorage.setItem('hms_token', data.token);
-      localStorage.setItem('hms_role', data.activeRole);
-      localStorage.setItem('userName', displayName || phone);
-      localStorage.setItem('hms_welcome', JSON.stringify({ role: data.activeRole, name: displayName }));
+      localStorage.setItem('patient_token', data.token);
+      localStorage.setItem('patient_role', data.activeRole);
+      localStorage.setItem('patient_userName', displayName || phone);
+      localStorage.setItem('patient_welcome', JSON.stringify({ role: data.activeRole, name: displayName }));
 
       if (data.activeRole === 'ADMIN') {
         router.push('/admin');

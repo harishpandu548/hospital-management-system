@@ -40,7 +40,7 @@ export const DoctorsProvider = ({ children }: { children: React.ReactNode }) => 
   const [fetchError, setFetchError] = useState('');
 
   const fetchDoctors = useCallback(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : null;
 
     if (!token) {
       setFetchError('Please log in to view available doctors.');
@@ -89,7 +89,7 @@ export const DoctorsProvider = ({ children }: { children: React.ReactNode }) => 
   // If there's no token yet (e.g. provider mounts on the login page), we don't
   // set an error — we wait for the DoctorsAppointment page to call refetch().
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : null;
     if (token) {
       fetchDoctors();
     }

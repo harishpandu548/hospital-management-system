@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { pageVariants, staggerContainer, fadeUp } from '@/lib/animations';
+import { io } from 'socket.io-client';
 import '@/styles/patient/my-appointments.css';
 
 const STATUS_BADGE_COLORS: Record<string, string> = {
@@ -24,14 +25,11 @@ const MyAppointmentsPage = () => {
   const [cancelError, setCancelError] = useState('');
   const router = useRouter();
 
-  useEffect(() => {
-    const token = localStorage.getItem('hms_token');
-    if (!token) { router.replace('/login'); return; }
+  const fetchAppointments = () => {
+    const token = localStorage.getItem('patient_token');
+    if (!token) return;
     setLoading(true);
-
-    fetch('/api/appointments', {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    fetch('/api/appointments', { headers: { Authorization: `Bearer ${token}` } })
       .then((res) => res.ok ? res.json() : [])
       .then((data) => {
         if (Array.isArray(data)) {
@@ -46,13 +44,27 @@ const MyAppointmentsPage = () => {
       })
       .catch(() => setAppointments([]))
       .finally(() => setLoading(false));
+  };
+
+  useEffect(() => {
+    const token = localStorage.getItem('patient_token');
+    if (!token) { router.replace('/login'); return; }
+    
+    fetchAppointments();
+
+    const socket = io('http://localhost:3001');
+    socket.on('appointment-update', () => {
+      fetchAppointments();
+    });
+
+    return () => { socket.disconnect(); };
   }, [activeTab, router]);
 
   const handleCancelConfirm = async () => {
     if (!cancelTarget) return;
     setCancelling(true);
     setCancelError('');
-    const token = localStorage.getItem('hms_token');
+    const token = localStorage.getItem('patient_token');
     try {
       const res = await fetch(`/api/appointments/${cancelTarget.id}/cancel`, {
         method: 'POST',

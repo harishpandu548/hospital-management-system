@@ -56,7 +56,7 @@ export default function AppointmentModal({ doctor, onClose }: { doctor: Doctor; 
 
   // ── Load family profiles and pre-select from localStorage ──
   useEffect(() => {
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : null;
     const storedPatientId = typeof window !== 'undefined' ? localStorage.getItem('patientId') : null;
     if (!token) return;
     fetch('/api/patients/family', { headers: { Authorization: `Bearer ${token}` } })
@@ -87,7 +87,7 @@ export default function AppointmentModal({ doctor, onClose }: { doctor: Doctor; 
   // ── Fetch slots when date changes ──
   useEffect(() => {
     if (!selectedDate) { setSlots([]); setNoAvailability(false); return; }
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : null;
     setSlotsLoading(true);
     setNoAvailability(false);
     setSelectedSlotISO('');
@@ -112,7 +112,7 @@ export default function AppointmentModal({ doctor, onClose }: { doctor: Doctor; 
       return;
     }
 
-    const token = typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+    const token = typeof window !== 'undefined' ? localStorage.getItem('patient_token') : null;
     if (!token) { router.push('/login'); return; }
 
     const selectedSlot = slots.find((s) => s.startISO === selectedSlotISO);
@@ -152,7 +152,7 @@ export default function AppointmentModal({ doctor, onClose }: { doctor: Doctor; 
       const selectedProfile = profiles.find((p) => p.id === selectedPatientId);
       const bookedFor = selectedProfile
         ? `${selectedProfile.firstName} ${selectedProfile.lastName}`
-        : (typeof window !== 'undefined' ? localStorage.getItem('userName') || 'Patient' : 'Patient');
+        : (typeof window !== 'undefined' ? localStorage.getItem('patient_userName') || 'Patient' : 'Patient');
 
       const appointmentData = {
         id: data.id,
@@ -165,6 +165,13 @@ export default function AppointmentModal({ doctor, onClose }: { doctor: Doctor; 
         bookingDate: new Date().toISOString().split('T')[0],
         patientName: bookedFor,
       };
+
+      // Emit real-time update to Receptionists and Admins
+      import('socket.io-client').then(({ io }) => {
+        const socket = io('http://localhost:3001');
+        socket.emit('appointment-update', appointmentData);
+        setTimeout(() => socket.disconnect(), 1500);
+      });
 
       setShowAlert(true);
       setTimeout(() => {

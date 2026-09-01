@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('receptionist_token') : null;
 
 const SettingsPage = () => {
   const [form, setForm] = useState({ oldPassword: '', newPassword: '', confirmPassword: '' });
@@ -10,8 +10,8 @@ const SettingsPage = () => {
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
 
-  const role = typeof window !== 'undefined' ? localStorage.getItem('hms_role') || '' : '';
-  const userName = typeof window !== 'undefined' ? localStorage.getItem('userName') || '' : '';
+  const role = typeof window !== 'undefined' ? localStorage.getItem('receptionist_role') || '' : '';
+  const userName = typeof window !== 'undefined' ? localStorage.getItem('receptionist_userName') || '' : '';
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm(p => ({ ...p, [e.target.name]: e.target.value }));

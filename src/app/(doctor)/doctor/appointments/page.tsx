@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FiFile, FiImage, FiFileText, FiExternalLink, FiChevronDown, FiChevronUp, FiHeart } from 'react-icons/fi';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('doctor_token') : null;
 
 const DOCTOR_TRANSITIONS: Record<string, string[]> = {
   CHECKED_IN: ['IN_PROGRESS'],

@@ -21,8 +21,8 @@ export default function ReceptionistLayout({ children }: { children: React.React
       setAuthed(false);
       return;
     }
-    const token = localStorage.getItem('hms_token');
-    const role = localStorage.getItem('hms_role');
+    const token = localStorage.getItem('receptionist_token');
+    const role = localStorage.getItem('receptionist_role');
     if (!token || role !== 'RECEPTIONIST') {
       // Admin users have their own portal — redirect them there
       if (token && role === 'ADMIN') {
@@ -49,7 +49,7 @@ export default function ReceptionistLayout({ children }: { children: React.React
               <main style={{ flex: 1, overflow: 'hidden auto' }}>
                 {children}
               </main>
-              <WelcomeGuard />
+              <WelcomeGuard storageKey="receptionist_welcome" />
               <Footer />
             </div>
           </div>

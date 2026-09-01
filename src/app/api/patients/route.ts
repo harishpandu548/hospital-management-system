@@ -69,6 +69,15 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    await prisma.auditLog.create({
+      data: {
+        entityType: "PATIENT",
+        entityId: patient.id,
+        action: "CREATE",
+        performedBy: userId,
+      },
+    });
+
     return NextResponse.json(patient, { status: 201 });
   } catch (error: any) {
     const msg: string = error.message ?? "Request failed";

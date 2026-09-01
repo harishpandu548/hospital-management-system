@@ -4,7 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 import { pageVariants, staggerContainer, fadeUp, scaleUp } from '@/lib/animations';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('doctor_token') : null;
 
 function calcAge(dob: string) {
   if (!dob) return '-';
@@ -54,8 +54,11 @@ const DoctorDashboard = () => {
   const [consultations, setConsultations] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [accepting, setAccepting] = useState<string | null>(null);
-  const [availableForCalls, setAvailableForCalls] = useState(false);
+  const [availableForCalls, setAvailableForCalls] = useState(() => typeof window !== 'undefined' ? localStorage.getItem('doctor_is_online') === 'true' : false);
   const [availToggling, setAvailToggling] = useState(false);
+
+  // Use a ref to hold socket connection so it persists
+  const socketRef = React.useRef<any>(null);
 
   useEffect(() => {
     const token = getToken();
@@ -66,15 +69,44 @@ const DoctorDashboard = () => {
       fetch('/api/consultations', { headers: { Authorization: `Bearer ${token}` } }).then(r => r.ok ? r.json() : []),
     ]).then(([prof, appts, consults]) => {
       setProfile(prof);
-      if (prof?.fullname) localStorage.setItem('userName', prof.fullname.split(' ')[0]);
+      if (prof?.fullname) localStorage.setItem('doctor_userName', prof.fullname.split(' ')[0]);
       setAppointments(Array.isArray(appts) ? appts : []);
       setConsultations(Array.isArray(consults) ? consults : []);
+
+      // Connect to WebSocket to receive instant consultation requests
+      if (prof?.id && !socketRef.current) {
+        import('socket.io-client').then(({ io }) => {
+          const socket = io('http://localhost:3001');
+          socketRef.current = socket;
+          socket.emit('join-doctor', prof.id);
+          socket.on('incoming-consultation', (consult: any) => {
+            setConsultations((prev) => {
+              // Avoid duplicates if they fetched it right at the same time
+              if (prev.some(c => c.id === consult.id)) return prev;
+              return [consult, ...prev];
+            });
+          });
+        });
+      }
+
     }).then(() => {
-      fetch('/api/doctors/availability-status', { headers: { Authorization: `Bearer ${getToken()}` } })
+      fetch('/api/doctors/availability-status', { headers: { Authorization: `Bearer ${getToken()}` }, cache: 'no-store' })
         .then(r => r.ok ? r.json() : null)
-        .then(d => { if (d) setAvailableForCalls(!!d.available); })
+        .then(d => { 
+          if (d) {
+            setAvailableForCalls(!!d.available);
+            localStorage.setItem('doctor_is_online', String(!!d.available));
+          } 
+        })
         .catch(() => {});
     }).catch(() => {}).finally(() => setLoading(false));
+
+    return () => {
+      if (socketRef.current) {
+        socketRef.current.disconnect();
+        socketRef.current = null;
+      }
+    };
   }, [router]);
 
   const today = new Date().toDateString();
@@ -107,7 +139,7 @@ const DoctorDashboard = () => {
   );
 
   return (
-    <motion.div variants={pageVariants} initial="initial" animate="animate">
+    <motion.div variants={pageVariants as any} initial="initial" animate="animate">
       {/* Availability toggle — slide in */}
       <motion.div
         initial={{ opacity: 0, x: -16 }}
@@ -128,11 +160,23 @@ const DoctorDashboard = () => {
             setAvailToggling(true);
             const token = getToken();
             const next = !availableForCalls;
+            setAvailableForCalls(next);
+            localStorage.setItem('doctor_is_online', String(next));
+            
             await fetch('/api/doctors/availability-status', {
               method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
               body: JSON.stringify({ available: next }),
             });
-            setAvailableForCalls(next);
+            
+            if (socketRef.current && profile) {
+              socketRef.current.emit('doctor-status-changed', { doctorId: profile.id, available: next });
+              socketRef.current.emit('audit-log', {
+                action: next ? 'Went online for instant calls' : 'Went offline',
+                entityType: 'DOCTOR',
+                entityId: profile.id,
+                performedBy: `Dr. ${profile.fullname}`
+              });
+            }
             setAvailToggling(false);
           }}
           disabled={availToggling}
@@ -170,7 +214,7 @@ const DoctorDashboard = () => {
 
       {/* Stats with animated counters */}
       <motion.div
-        variants={staggerContainer}
+        variants={staggerContainer as any}
         initial="initial"
         animate="animate"
         style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(200px, 1fr))', gap: 16, marginBottom: 28 }}
@@ -183,7 +227,7 @@ const DoctorDashboard = () => {
         ].map((s, i) => (
           <motion.div
             key={s.label}
-            variants={fadeUp}
+            variants={fadeUp as any}
             whileHover={{ y: -4, boxShadow: '0 12px 32px rgba(15,23,42,0.12)' }}
             whileTap={{ scale: 0.97 }}
             style={{ background: '#fff', borderRadius: 14, padding: '20px', border: '1px solid #e2e8f0', boxShadow: '0 2px 8px rgba(15,23,42,0.06)', display: 'flex', gap: 14, alignItems: 'center' }}

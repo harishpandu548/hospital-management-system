@@ -4,7 +4,7 @@ import { useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { pageVariants, staggerContainer, fadeUp, scaleUp } from '@/lib/animations';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('doctor_token') : null;
 
 function calcAge(dob: string) {
   if (!dob) return '-';

@@ -3,7 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { pageVariants, staggerContainer, fadeUp } from '@/lib/animations';
 
-const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('hms_token') : null;
+const getToken = () => typeof window !== 'undefined' ? localStorage.getItem('admin_token') : null;
 
 const DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
 
@@ -373,12 +373,14 @@ const AvailabilityModal = ({ doctor, onClose }: { doctor: any; onClose: () => vo
     try {
       const token = getToken();
       const today = form.validFrom;
-      const startISO = new Date(`${today}T${form.startTime}:00`).toISOString();
-      const endISO = new Date(`${today}T${form.endTime}:00`).toISOString();
+      // Use UTC explicitly so stored time-of-day matches what admin entered
+      const startISO = `${today}T${form.startTime}:00.000Z`;
+      const endISO   = `${today}T${form.endTime}:00.000Z`;
+      const validFromISO = `${today}T00:00:00.000Z`;
       const res = await fetch(`/api/doctors/${doctor.id}/availability`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
-        body: JSON.stringify({ dayOfWeek: form.dayOfWeek, startTime: startISO, endTime: endISO, slotDurationMinutes: form.slotDurationMinutes, maxPatientsPerSlot: form.maxPatientsPerSlot, validFrom: new Date(form.validFrom).toISOString() }),
+        body: JSON.stringify({ dayOfWeek: form.dayOfWeek, startTime: startISO, endTime: endISO, slotDurationMinutes: form.slotDurationMinutes, maxPatientsPerSlot: form.maxPatientsPerSlot, validFrom: validFromISO }),
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Failed to add rule.'); return; }
@@ -415,14 +417,14 @@ const AvailabilityModal = ({ doctor, onClose }: { doctor: any; onClose: () => vo
         <form onSubmit={handleAddRule} style={{ background: '#fafafa', borderRadius: 12, padding: 16, marginBottom: 16, display: 'flex', flexDirection: 'column', gap: 12 }}>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Day</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Day of the Week</label>
               <select value={form.dayOfWeek} onChange={e => setForm(p => ({ ...p, dayOfWeek: parseInt(e.target.value) }))}
                 style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13, outline: 'none' }}>
                 {DAYS.map((d, i) => <option key={i} value={i}>{d}</option>)}
               </select>
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Valid From</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Starts On (Date)</label>
               <input type="date" value={form.validFrom} onChange={e => setForm(p => ({ ...p, validFrom: e.target.value }))}
                 style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box', outline: 'none' }} />
             </div>
@@ -437,12 +439,12 @@ const AvailabilityModal = ({ doctor, onClose }: { doctor: any; onClose: () => vo
                 style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box', outline: 'none' }} />
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Slot Duration (min)</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Mins per Appointment</label>
               <input type="number" value={form.slotDurationMinutes} min={5} onChange={e => setForm(p => ({ ...p, slotDurationMinutes: parseInt(e.target.value) }))}
                 style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box', outline: 'none' }} />
             </div>
             <div>
-              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Max Patients/Slot</label>
+              <label style={{ fontSize: 12, fontWeight: 600, color: '#374151', display: 'block', marginBottom: 4 }}>Patients per Slot</label>
               <input type="number" value={form.maxPatientsPerSlot} min={1} onChange={e => setForm(p => ({ ...p, maxPatientsPerSlot: parseInt(e.target.value) }))}
                 style={{ width: '100%', padding: '8px 10px', borderRadius: 8, border: '1.5px solid #e2e8f0', fontSize: 13, boxSizing: 'border-box', outline: 'none' }} />
             </div>

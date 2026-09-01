@@ -49,9 +49,9 @@ const SignupPage = () => {
       });
       const data = await res.json();
       if (!res.ok) { setError(data.error || 'Registration failed'); return; }
-      localStorage.setItem('hms_token', data.token);
-      localStorage.setItem('hms_role', data.activeRole);
-      localStorage.setItem('userName', formData.phone);
+      localStorage.setItem('patient_token', data.token);
+      localStorage.setItem('patient_role', data.activeRole);
+      localStorage.setItem('patient_userName', formData.phone);
       router.push('/home');
     } catch {
       setError('Something went wrong. Please try again.');
